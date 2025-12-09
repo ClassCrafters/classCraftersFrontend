@@ -13,6 +13,10 @@ export const fetchLogin = createAsyncThunk(
         localStorage.setItem("token", response.token);
       }
 
+      if(response.user) {
+        localStorage.setItem("role", response.user.role);
+      }
+
       return response;
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);
@@ -38,6 +42,7 @@ const authSlice = createSlice({
   initialState: {
     user: null,
     token: localStorage.getItem("token") || null,
+    role: localStorage.getItem("role") || null,
     loading: false,
     error: null,
     signupSuccess: false,

@@ -261,34 +261,35 @@ export default function StudentRegistration() {
                 <CardHeader>
                     <CardTitle>Students List</CardTitle>
                 </CardHeader>
-                <CardContent>
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                {/* <TableHead>Name</TableHead> */}
-                                {/* <TableHead>Email</TableHead> */}
-                                <TableHead>User</TableHead>
-                                <TableHead>Institution</TableHead>
-                                <TableHead>Phase</TableHead>
-                                <TableHead>SubGroup</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {students.map((s) => (
-                                <TableRow key={s.id}>
-                                    <TableCell>
-                                        {s.user?.name || "-"}
-                                    </TableCell>
 
-                                    <TableCell>{s.institution?.name || "-"}</TableCell>
-                                    <TableCell>{s.phase?.name || "-"}</TableCell>
-                                    <TableCell>{s.subgroup?.name || "-"}</TableCell>
+                <CardContent>
+                    {/* Scrollable container */}
+                    <div className="max-h-80 overflow-y-auto rounded-md border">
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>User</TableHead>
+                                    <TableHead>Institution</TableHead>
+                                    <TableHead>Phase</TableHead>
+                                    <TableHead>SubGroup</TableHead>
                                 </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
+                            </TableHeader>
+
+                            <TableBody>
+                                {students.map((s) => (
+                                    <TableRow key={s.id}>
+                                        <TableCell>{s.user?.name || "-"}</TableCell>
+                                        <TableCell>{s.institution?.name || "-"}</TableCell>
+                                        <TableCell>{s.phase?.name || "-"}</TableCell>
+                                        <TableCell>{s.subgroup?.name || "-"}</TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </div>
                 </CardContent>
             </Card>
+
         </div>
     );
 }
