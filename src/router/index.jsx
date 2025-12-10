@@ -21,107 +21,41 @@ const AppRouter = () => {
   return (
     <BrowserRouter>
       <Routes>
+
         {/* PUBLIC PAGE */}
         <Route path="/login/auth" element={<LoginPage />} />
 
-        {/* PROTECTED LAYOUT */}
-        <Route element={<HorizontalLayout />}>
-          
-          {/* DASHBOARD - allowed for all roles */}
-          <Route
-            path="/"
-            element={
-              <ProtectedRoute allowedRoles={["Admin", "Teacher", "Student"]}>
-                <IndexPage />
-              </ProtectedRoute>
-            }
-          />
+        {/* =============================
+            PROTECTED ROUTES
+        ============================== */}
+        <Route element={<ProtectedRoute allowedRoles={["Admin","Teacher","Student"]} />}>
+          <Route element={<HorizontalLayout />}>
 
-          {/* Admin ONLY */}
-          <Route
-            path="/users"
-            element={
-              <ProtectedRoute allowedRoles={["Admin"]}>
-                <UsersPage />
-              </ProtectedRoute>
-            }
-          />
+            {/* Dashboard (all roles) */}
+            <Route path="/" element={<IndexPage />} />
 
-          {/* Admin ONLY */}
-          <Route
-            path="/roles"
-            element={
-              <ProtectedRoute allowedRoles={["Admin"]}>
-                <RolesPage />
-              </ProtectedRoute>
-            }
-          />
+            {/* ADMIN ONLY */}
+            <Route element={<ProtectedRoute allowedRoles={["Admin"]} />}>
+              <Route path="/users" element={<UsersPage />} />
+              <Route path="/roles" element={<RolesPage />} />
+            </Route>
 
-          {/* Teacher + Admin */}
-          <Route
-            path="/Students/list"
-            element={
-              <ProtectedRoute allowedRoles={["Teacher", "Admin"]}>
-                <StudentPage />
-              </ProtectedRoute>
-            }
-          />
+            {/* TEACHER + ADMIN */}
+            <Route element={<ProtectedRoute allowedRoles={["Teacher", "Admin"]} />}>
+              <Route path="/students/list" element={<StudentPage />} />
+              <Route path="/classrooms/list" element={<ClassroomPage />} />
+              <Route path="/manage-classrooms/:id" element={<ManageClassroom />} />
+              <Route path="/payment/payments" element={<PaymentListPage />} />
+              <Route path="/payment/payments/:institution_id" element={<PaymentListByInstitutionPage />} />
+            </Route>
 
-          <Route
-            path="/classrooms/list"
-            element={
-              <ProtectedRoute allowedRoles={["Teacher", "Admin"]}>
-                <ClassroomPage />
-              </ProtectedRoute>
-            }
-          />
+            {/* STUDENT + TEACHER + ADMIN */}
+            <Route element={<ProtectedRoute allowedRoles={["Student", "Teacher", "Admin"]} />}>
+              <Route path="/payment/fee-structure" element={<PaymentPage />} />
+              <Route path="/settings/profile" element={<ProfilePage />} />
+            </Route>
 
-          <Route
-            path="/manage-classrooms/:id"
-            element={
-              <ProtectedRoute allowedRoles={["Teacher", "Admin"]}>
-                <ManageClassroom />
-              </ProtectedRoute>
-            }
-          />
-
-          {/* Student + Teacher + Admin */}
-          <Route
-            path="/payment/fee-structure"
-            element={
-              <ProtectedRoute allowedRoles={["Student", "Teacher", "Admin"]}>
-                <PaymentPage />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="/payment/payments"
-            element={
-              <ProtectedRoute allowedRoles={["Teacher", "Admin"]}>
-                <PaymentListPage />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="/payment/payments/:institution_id"
-            element={
-              <ProtectedRoute allowedRoles={["Teacher", "Admin"]}>
-                <PaymentListByInstitutionPage />
-              </ProtectedRoute>
-            }
-          />
-
-          {/* ALL ROLES */}
-          <Route
-            path="/settings/profile"
-            element={
-              <ProtectedRoute allowedRoles={["Student", "Teacher", "Admin"]}>
-                <ProfilePage />
-              </ProtectedRoute>
-            }
-          />
+          </Route>
         </Route>
 
       </Routes>
