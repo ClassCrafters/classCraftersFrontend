@@ -8,10 +8,7 @@ export const fetchLogin = createAsyncThunk(
     try {
       const response = await authService.login(credentials);
 
-      // Save token
-      if (response.token) {
-        localStorage.setItem("token", response.token);
-      }
+
 
       return response;
     } catch (error) {
@@ -38,6 +35,7 @@ const authSlice = createSlice({
   initialState: {
     user: null,
     token: localStorage.getItem("token") || null,
+    role: localStorage.getItem("role") || null,
     loading: false,
     error: null,
     signupSuccess: false,
@@ -60,6 +58,7 @@ const authSlice = createSlice({
         state.loading = false;
         state.user = action.payload.user;
         state.token = action.payload.token;
+        state.role = action.payload.user?.role || null;
       })
       .addCase(fetchLogin.rejected, (state, action) => {
         state.loading = false;

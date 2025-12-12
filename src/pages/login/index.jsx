@@ -29,14 +29,14 @@ export default function LoginPage() {
     dispatch(fetchLogin({ email, password_hash: password }));
   };
 
-  // ✅ Redirect if login successful
-  useEffect(() => {
-    if (token) {
-      // optional: persist token
-      localStorage.setItem("token", token);
-      navigate("/");
-    }
-  }, [token, navigate]);
+ useEffect(() => {
+  if (token && user?.role) {
+    localStorage.setItem("token", token);
+    localStorage.setItem("role", user.role);
+
+    navigate("/");
+  }
+}, [token, user, navigate]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-100">

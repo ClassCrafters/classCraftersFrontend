@@ -12,11 +12,12 @@ import {
   School,
   Receipt,
 } from "lucide-react";
+import { Link } from "react-router-dom"; // 🔥 IMPORTANT
 import logo from "@/assets/logo.png";
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(true);
-  const [openMenu, setOpenMenu] = useState(null); // for sub-sidebar
+  const [openMenu, setOpenMenu] = useState(null);
 
   const toggleSubMenu = (label) => {
     setOpenMenu(openMenu === label ? null : label);
@@ -28,11 +29,7 @@ const Sidebar = () => {
     {
       label: "Classrooms",
       icon: <School size={20} />,
-      children: [
-        { href: "/classrooms/list", label: "All Classrooms" },
-        // { href: "/classrooms/add", label: "Add Classroom" },
-        // { href: "/classrooms/sections", label: "Sections" },
-      ],
+      children: [{ href: "/classrooms/list", label: "All Classrooms" }],
     },
 
     {
@@ -55,8 +52,8 @@ const Sidebar = () => {
       ],
     },
 
-    { href: "/settings", 
-      label: "Settings", 
+    {
+      label: "Settings",
       icon: <Settings size={20} />,
       children: [
         { href: "/settings/profile", label: "Profile" },
@@ -105,28 +102,34 @@ const Sidebar = () => {
           return (
             <div key={i}>
               {/* MAIN ITEM */}
-              <motion.div
-                onClick={() => (hasChildren ? toggleSubMenu(item.label) : null)}
-                className={`flex items-center justify-between text-gray-700 hover:bg-blue-50 hover:text-[#557A66] rounded px-3 py-2 cursor-pointer ${
-                  !isOpen ? "justify-center" : ""
-                }`}
-                whileHover={{ scale: 1.03 }}
-              >
-                <div className="flex items-center gap-3">
+              {!hasChildren ? (
+                // 🔥 DIRECT NAVIGATION PAGE LINK
+                <Link
+                  to={item.href}
+                  className={`flex items-center gap-3 text-gray-700 hover:bg-blue-50 hover:text-[#557A66] rounded px-3 py-2 cursor-pointer ${
+                    !isOpen ? "justify-center" : ""
+                  }`}
+                >
                   {item.icon}
                   {isOpen && <span>{item.label}</span>}
-                </div>
+                </Link>
+              ) : (
+                // 🔥 MENU WITH CHILDREN (toggle only)
+                <motion.div
+                  onClick={() => toggleSubMenu(item.label)}
+                  className={`flex items-center justify-between text-gray-700 hover:bg-blue-50 hover:text-[#557A66] rounded px-3 py-2 cursor-pointer ${
+                    !isOpen ? "justify-center" : ""
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    {item.icon}
+                    {isOpen && <span>{item.label}</span>}
+                  </div>
 
-                {isOpen && hasChildren && (
-                  <>
-                    {isSubOpen ? (
-                      <ChevronUp size={18} />
-                    ) : (
-                      <ChevronDown size={18} />
-                    )}
-                  </>
-                )}
-              </motion.div>
+                  {isOpen &&
+                    (isSubOpen ? <ChevronUp size={18} /> : <ChevronDown size={18} />)}
+                </motion.div>
+              )}
 
               {/* SUB MENU */}
               <AnimatePresence>
@@ -138,13 +141,13 @@ const Sidebar = () => {
                     className="ml-10 mt-1 flex flex-col gap-1"
                   >
                     {item.children.map((sub, j) => (
-                      <a
+                      <Link
                         key={j}
-                        href={sub.href}
+                        to={sub.href}
                         className="text-sm text-gray-600 hover:text-[#557A66] hover:bg-gray-200/40 rounded px-2 py-1"
                       >
                         {sub.label}
-                      </a>
+                      </Link>
                     ))}
                   </motion.div>
                 )}
