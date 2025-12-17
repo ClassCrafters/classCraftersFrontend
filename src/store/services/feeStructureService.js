@@ -13,8 +13,8 @@ export const createFeeStructure = async (feeData) => {
     return response.data;
 }
 
-export const createFeeHead = async (structureId, headData) => {
-    const response = await axios.post(`${API_URL}/fee-structures/2/heads`, headData,
+export const createFeeHead = async (structureId, heads) => {
+    const response = await axios.post(`${API_URL}/fee-structures/2/heads`, {heads:heads},
         {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -24,8 +24,8 @@ export const createFeeHead = async (structureId, headData) => {
     return response.data;
 }
 
-export const createFeeInstallment = async (structureId, installmentData) => {
-    const response = await axios.post(`${API_URL}/fee-structures/${structureId}/installments`, installmentData,
+export const createFeeInstallment = async (structureId, installments) => {
+    const response = await axios.post(`${API_URL}/fee-structures/2/installments`, {installments:installments},
         {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -35,8 +35,8 @@ export const createFeeInstallment = async (structureId, installmentData) => {
     return response.data;
 }
 
-export const createFeeDiscount = async (structureId, discountData) => {
-    const response = await axios.post(`${API_URL}/fee-structures/${structureId}/discounts`, discountData,
+export const createFeeDiscount = async (structureId, discounts) => {
+    const response = await axios.post(`${API_URL}/fee-structures/2/discounts`, {discounts:discounts},
 
         {
             headers: {

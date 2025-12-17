@@ -16,15 +16,19 @@ export const createFeeStructure = createAsyncThunk(
 
 // Create Fee Head
 export const createFeeHead = createAsyncThunk(
-  "feeStructure/createFeeHead",
-  async ({ structureId, headData }, { rejectWithValue }) => {
-          console.log("in slice:", headData);
-
+  "feeStructure/createFeeHeads",
+  async ({ fee_structure_id, heads }, { rejectWithValue }) => {
     try {
-      const response = await feeStructureService.createFeeHead(structureId, headData);
+      console.log("payload in thunk:", heads);
+
+      const response = await feeStructureService.createFeeHead(
+        fee_structure_id,
+        heads
+      );
+
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response?.data);
     }
   }
 );
@@ -32,9 +36,9 @@ export const createFeeHead = createAsyncThunk(
 // Create Fee Installment
 export const createFeeInstallment = createAsyncThunk(
   "feeStructure/createFeeInstallment",
-    async ({ structureId, installmentData }, { rejectWithValue }) => {
+    async ({ structureId, installments }, { rejectWithValue }) => {
     try {
-      const response = await feeStructureService.createFeeInstallment(structureId, installmentData);
+      const response = await feeStructureService.createFeeInstallment(structureId, installments);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -45,9 +49,9 @@ export const createFeeInstallment = createAsyncThunk(
 // Create Fee Discount
 export const createFeeDiscount = createAsyncThunk(
   "feeStructure/createFeeDiscount",
-    async ({ structureId, discountData }, { rejectWithValue }) => {
+    async ({ structureId, discounts }, { rejectWithValue }) => {
     try {
-      const response = await feeStructureService.createFeeDiscount(structureId, discountData);
+      const response = await feeStructureService.createFeeDiscount(structureId, discounts);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);

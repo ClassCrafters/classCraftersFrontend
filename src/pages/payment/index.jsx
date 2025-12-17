@@ -49,6 +49,7 @@ import {
 } from "../../store/selectors/paymentSelectors";
 
 import { createFeeStructure, createFeeHead, createFeeInstallment, createFeeDiscount, createFineRule } from "../../store/slices/feeStructureSlice";
+import Swal from "sweetalert2";
 
 
 /* =======================
@@ -82,8 +83,8 @@ const formSchema = z.object({
 
     installments: z.array(
         z.object({
-            installment_no: z.string().min(1, "Installment number required"),
-            installment_type: z.number(),
+            installment_no: z.coerce.number().min(1, "Installment number required"),
+            installment_type: z.string(),
             due_date: z.string().min(1, "Date required"),
             amount: z
                 .number({ invalid_type_error: "Amount must be a number" })
@@ -96,13 +97,13 @@ const formSchema = z.object({
             z.object({
                 name: z.string().min(1, "Discount name required"),
                 description: z.string().optional(),
-                discount_type: z.enum(["Percentage", "Flat"]),
+                discount_type: z.enum(["PERCENTAGE", "FIXED"]),
                 amount: z.number().positive("Amount required"),
                 // applies_to_head_id: z.array(z.number()),
             })
         )
         .optional()
-       
+
 });
 
 
@@ -112,7 +113,7 @@ const formSchema = z.object({
 
 function FeeStructureModal({ open, onClose }) {
     const [step, setStep] = useState(1);
-      const dispatch = useDispatch();
+    const dispatch = useDispatch();
     const {
         register,
         control,
@@ -134,10 +135,10 @@ function FeeStructureModal({ open, onClose }) {
             fee_heads: [{ name: "", amount: undefined }],
             installments: [
                 {
-                    installment_no: "",
-                    installment_type: 1,
+                    installment_no: null,
+                    installment_type: "",
                     due_date: "",
-                    amount: undefined,
+                    amount: null,
                 },
             ],
             discounts: [{
@@ -180,86 +181,104 @@ function FeeStructureModal({ open, onClose }) {
 
     /* ================= SUBMIT ================= */
 
-  const onSubmit = async (data) => {
-  
-  try {
-    /* ===============================
-       1️⃣ CREATE FEE STRUCTURE
-    =============================== */
+    const onSubmit = async (data) => {
+        try {
+            /* ===============================
+               LOADING ALERT
+            =============================== */
 
-    const feeStructureRes = await dispatch(
-      createFeeStructure(data.fee_structure)
-    ).unwrap();
+            Swal.fire({
+                title: "Creating Fee Structure...",
+                text: "Please wait while we save the details",
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                },
+            });
 
-    const feeStructureId = feeStructureRes.id;
+            /* ===============================
+               1️⃣ CREATE FEE STRUCTURE
+            =============================== */
 
-    /* ===============================
-       2️⃣ CREATE FEE HEADS
-    =============================== */
+            const feeStructureRes = await dispatch(
+                createFeeStructure(data.fee_structure)
+            ).unwrap();
 
-    for (const head of data.fee_heads) {
-      await dispatch(
-        createFeeHead({
-          ...head,
-          fee_structure_id: feeStructureId,
-        })
-      );
-    }
+            const feeStructureId = feeStructureRes.id;
 
-    /* ===============================
-       3️⃣ CREATE INSTALLMENTS
-    =============================== */
+            /* ===============================
+               2️⃣ CREATE FEE HEADS
+            =============================== */
 
-    for (const installment of data.installments) {
-      await dispatch(
-        createFeeInstallment({
-          ...installment,
-          fee_structure_id: feeStructureId,
-        })
-      );
-    }
+            await dispatch(
+                createFeeHead({
+                    fee_structure_id: feeStructureId,
+                    heads: data.fee_heads,
+                })
+            ).unwrap();
 
-    /* ===============================
-       4️⃣ CREATE DISCOUNTS
-    =============================== */
+            /* ===============================
+               3️⃣ CREATE INSTALLMENTS
+            =============================== */
 
-    if (data.discounts?.length) {
-      for (const discount of data.discounts) {
-        await dispatch(
-          createFeeDiscount({
-            ...discount,
-            fee_structure_id: feeStructureId,
-          })
-        );
-      }
-    }
+            const normalizedInstallments = data.installments.map((inst) => ({
+                installment_no: Number(inst.installment_no),
+                installment_type: inst.installment_type,
+                due_date: new Date(inst.due_date).toISOString(),
+                amount: Number(inst.amount),
+            }));
 
-    /* ===============================
-       5️⃣ CREATE FINE RULES (OPTIONAL)
-    =============================== */
+            await dispatch(
+                createFeeInstallment({
+                    installments: normalizedInstallments,
+                    fee_structure_id: feeStructureId,
+                })
+            ).unwrap();
 
-    if (data.fine_rules?.length) {
-      for (const rule of data.fine_rules) {
-        await dispatch(
-          createFineRule({
-            ...rule,
-            fee_structure_id: feeStructureId,
-          })
-        );
-      }
-    }
+            /* ===============================
+               4️⃣ CREATE DISCOUNTS
+            =============================== */
 
-    /* ===============================
-       SUCCESS
-    =============================== */
+            if (data.discounts?.length) {
+                await dispatch(
+                    createFeeDiscount({
+                        discounts: data.discounts,
+                        fee_structure_id: feeStructureId,
+                    })
+                ).unwrap();
+            }
 
-    console.log("All data dispatched successfully");
-    onClose(false);
+            /* ===============================
+               SUCCESS ALERT
+            =============================== */
 
-  } catch (error) {
-    console.error("Failed to create fee structure flow:", error);
-  }
-};
+            Swal.fire({
+                icon: "success",
+                title: "Success!",
+                text: "Fee structure created successfully",
+                confirmButtonColor: "#496F63",
+            });
+
+            onClose(false);
+
+        } catch (error) {
+            console.error("Failed to create fee structure flow:", error);
+
+            /* ===============================
+               ERROR ALERT
+            =============================== */
+
+            Swal.fire({
+                icon: "error",
+                title: "Something went wrong",
+                text:
+                    error?.message ||
+                    "Failed to create fee structure. Please try again.",
+                confirmButtonColor: "#d33",
+            });
+        }
+    };
+
 
     /* =====================================================
        UI
@@ -396,19 +415,35 @@ function FeeStructureModal({ open, onClose }) {
                                 {installments.fields.map((_, i) => (
                                     <div
                                         key={i}
-                                        className="grid grid-cols-3 gap-3 p-3 border rounded-md bg-gray-50"
+                                        className="mt-4 space-y-4"
                                     >
+
+                                        <label className={sectionTitle}>Installment No</label>
                                         <input
+                                            type="number"
                                             {...register(`installments.${i}.installment_no`)}
                                             placeholder="Installment No"
                                             className={inputClass}
                                         />
+                                        <label className={sectionTitle}>Installment Type</label>
+                                        <select
+                                            {...register(`installments.${i}.installment_type`, {
+                                                valueAsNumber: false,
+                                            })}
+                                            className={inputClass}
+                                        >
+                                            <option value="">Select Type</option>
+                                            <option value="MONTHLY">Monthly</option>
+                                            <option value="QUARTERLY">Quarterly</option>
+                                        </select>
 
+                                        <label className={sectionTitle}>Due Date</label>
                                         <input
                                             type="date"
                                             {...register(`installments.${i}.due_date`)}
                                             className={inputClass}
                                         />
+                                        <label className={sectionTitle}>Amount</label>
 
                                         <input
                                             type="number"
@@ -456,7 +491,7 @@ function FeeStructureModal({ open, onClose }) {
                                         discounts.append({
                                             name: "",
                                             description: "",
-                                            discount_type: "Percentage",
+                                            discount_type: "PERCENTAGE",
                                             amount: 1,
                                             applies_to_head_id: [],
                                         })
@@ -503,8 +538,8 @@ function FeeStructureModal({ open, onClose }) {
                                                     {...register(`discounts.${i}.discount_type`)}
                                                     className={inputClass}
                                                 >
-                                                    <option value="Percentage">Percentage</option>
-                                                    <option value="Flat">Flat</option>
+                                                    <option value="PERCENTAGE">Percentage</option>
+                                                    <option value="FIXED">Fixed</option>
                                                 </select>
                                             </div>
 
