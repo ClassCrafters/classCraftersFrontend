@@ -16,7 +16,9 @@ export const getClassrooms = async () => {
 }  
 
 export const getClassroomById = async (id) => {
+  // console.log("Fetching classroom with ID:", id);
   const response = await axios.get(`${API_URL}/classrooms/${id}`);
+  // console.log("Classroom Service getById Response:", response);
   return response.data;
 }
 

@@ -11,3 +11,12 @@ export const getAttendanceDataByDate = async (date) => {
   });
   return response.data;
 }
+
+export const postAttendanceDataStudents = async (attendanceData) => {
+  const response = await axios.post(`${API_URL}/attendance/recordStudentAttendance`, attendanceData, {
+    headers: {  
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+  });
+  return response.data;
+}

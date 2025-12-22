@@ -14,15 +14,15 @@ import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { useDispatch, useSelector } from "react-redux";
 
-import { getAttendanceDataByDate } from "../../../store/slices/attendanceSlice";
+import { getAttendanceDataByDate, postAttendanceDataStudents } from "../../../store/slices/attendanceSlice";
 import {
     selectAttendanceData,
     selectAttendanceLoading,
     selectAttendanceError,
 } from "../../../store/selectors/attendanceSelectors";
 
-import { getClassroom,getClassroomById } from "../../../store/slices/classRoomSlice";
-import { selectClassrooms,selectClassroomById } from "../../../store/selectors/classRoomSelectors";
+import { getClassroom, getClassroomById } from "../../../store/slices/classRoomSlice";
+import { selectClassrooms, selectClassroomById } from "../../../store/selectors/classRoomSelectors";
 
 import {
     Select,
@@ -173,13 +173,22 @@ const LeaveManagement = ({ date }) => (
 /* =============================
    TAKE ATTENDANCE TABLE
 ============================= */
-const TakeAttendanceTable = ({ type, date }) => {
-    const data = [
-        { id: 1, name: "Amit Kumar" },
-        { id: 2, name: "Riya Sharma" },
-        { id: 3, name: "Suresh Das" },
-    ];
+const TakeAttendanceTable = ({ type, date, data, onTakeAttendance }) => {
+    const students = data?.students || [];
+    // console.log("Students for attendance:", data.classroom);
+    const takeStudentAttendance = (status, studentId, classroomId) => {
+        console.log("Child clicked:", {
+            status,
+            studentId,
+            classroomId,
+        });
 
+        onTakeAttendance?.({
+            status,
+            studentId,
+            classroomId,
+        });
+    };
     return (
         <div className="border rounded-xl overflow-hidden">
             <table className="w-full text-sm">
@@ -192,15 +201,55 @@ const TakeAttendanceTable = ({ type, date }) => {
                     </tr>
                 </thead>
                 <tbody>
-                    {data.map((item) => (
-                        <tr key={item.id} className="border-t">
-                            <td className="p-3">{item.name}</td>
-                            <td className="text-center cursor-pointer">✅</td>
-                            <td className="text-center cursor-pointer">❌</td>
-                            <td className="text-center cursor-pointer">🟡</td>
-                        </tr>
-                    ))}
+                    {data?.classroom?.students?.length > 0 &&
+                        data.classroom.students.map((item) => (
+                            <tr key={item.id} className="border-t">
+                                <td className="p-3">
+                                    {item.student?.name?.length ? item.student.name : "-"}
+                                </td>
+
+                                <td
+                                    className="text-center cursor-pointer"
+                                    onClick={() =>
+                                        takeStudentAttendance(
+                                            "PRESENT",
+                                            item.student.id,
+                                            item.classroomId
+                                        )
+                                    }
+                                >
+                                    ✅
+                                </td>
+
+                                <td
+                                    className="text-center cursor-pointer"
+                                    onClick={() =>
+                                        takeStudentAttendance(
+                                            "ABSENT",
+                                            item.student.id,
+                                            item.classroomId
+                                        )
+                                    }
+                                >
+                                    ❌
+                                </td>
+
+                                <td
+                                    className="text-center cursor-pointer"
+                                    onClick={() =>
+                                        takeStudentAttendance(
+                                            "LEAVE",
+                                            item.student.id,
+                                            item.classroomId
+                                        )
+                                    }
+                                >
+                                    🟡
+                                </td>
+                            </tr>
+                        ))}
                 </tbody>
+
             </table>
 
             <div className="p-3 text-xs text-gray-500 bg-gray-50">
@@ -227,100 +276,122 @@ const AttendancePage = () => {
     const classrooms = useSelector(selectClassrooms);
     const classroom = useSelector(selectClassroomById);
     // console.log("Classrooms:", classrooms);
-    // console.log("Selected Classroom:", classroom);
+    console.log("Selected Classroom:", classroom);
 
     // console.log("Attendance Data:", attendance);
-    useEffect(() => {
-        dispatch(getAttendanceDataByDate(selectedDate));
-        dispatch(getClassroom());
-        dispatch(getClassroomById(selectedClassId));
-    }, [dispatch, selectedDate, selectedClassId]);
 
-    return (
-        <div className="container mx-auto p-4">
-            <Card className="shadow-md rounded-2xl border border-gray-200 p-6 mt-6">
+    const handleTakeAttendance = ({ status, studentId, classroomId }) => {
+        console.log("Received in AttendancePage:", {
+            status,
+            studentId,
+            classroomId,
+            date: selectedDate,
+        });
 
-                {/* HEADER */}
-                <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-                    <h1 className="text-xl font-bold">Attendance Dashboard</h1>
+        const attendanceData = {
+            // date: selectedDate,
+            studentRegId: studentId,
+            classroomId,
+            status,
+            remarks: "good", // TODO: Replace with actual logged-in user ID
+        };
 
-                    <div className="flex items-center gap-4">
-                        {/* CLASSROOM DROPDOWN */}
-                        <ClassroomSelect
-                            classrooms={classrooms}
-                            value={selectedClassId}
-                            onChange={(value) => setSelectedClassId(value)}
-                        />
+        dispatch(postAttendanceDataStudents(attendanceData));
+    }
 
 
-                        {/* DATE PICKER */}
-                        <Popover>
-                            <PopoverTrigger asChild>
-                                <Button
-                                    variant="outline"
-                                    className="w-[190px] justify-start text-left font-normal"
-                                >
-                                    <CalendarIcon className="mr-2 h-4 w-4" />
-                                    {format(selectedDate, "PPP")}
-                                </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0" align="end">
-                                <Calendar
-                                    mode="single"
-                                    selected={selectedDate}
-                                    onSelect={setSelectedDate}
-                                    disabled={(date) => date > new Date()}
-                                    initialFocus
-                                />
-                            </PopoverContent>
-                        </Popover>
+        useEffect(() => {
+            dispatch(getAttendanceDataByDate(selectedDate));
+            dispatch(getClassroom());
+            dispatch(getClassroomById(selectedClassId));
+        }, [dispatch, selectedDate, selectedClassId]);
 
-                        {/* TOGGLE */}
-                        <div className="flex items-center gap-2">
-                            <Label htmlFor="kanban-mode" className="text-sm">
-                                Take Attendance
-                            </Label>
-                            <Switch
-                                id="kanban-mode"
-                                checked={kanbanMode}
-                                onCheckedChange={setKanbanMode}
+        return (
+            <div className="container mx-auto p-4">
+                <Card className="shadow-md rounded-2xl border border-gray-200 p-6 mt-6">
+
+                    {/* HEADER */}
+                    <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+                        <h1 className="text-xl font-bold">Attendance Dashboard</h1>
+
+                        <div className="flex items-center gap-4">
+                            {/* CLASSROOM DROPDOWN */}
+                            <ClassroomSelect
+                                classrooms={classrooms}
+                                value={selectedClassId}
+                                onChange={(value) => setSelectedClassId(value)}
                             />
+
+
+                            {/* DATE PICKER */}
+                            <Popover>
+                                <PopoverTrigger asChild>
+                                    <Button
+                                        variant="outline"
+                                        className="w-[190px] justify-start text-left font-normal"
+                                    >
+                                        <CalendarIcon className="mr-2 h-4 w-4" />
+                                        {format(selectedDate, "PPP")}
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-auto p-0" align="end">
+                                    <Calendar
+                                        mode="single"
+                                        selected={selectedDate}
+                                        onSelect={setSelectedDate}
+                                        disabled={(date) => date > new Date()}
+                                        initialFocus
+                                    />
+                                </PopoverContent>
+                            </Popover>
+
+                            {/* TOGGLE */}
+                            <div className="flex items-center gap-2">
+                                <Label htmlFor="kanban-mode" className="text-sm">
+                                    Take Attendance
+                                </Label>
+                                <Switch
+                                    id="kanban-mode"
+                                    checked={kanbanMode}
+                                    onCheckedChange={setKanbanMode}
+                                />
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                {/* TABS */}
-                <Tabs defaultValue="students">
-                    <TabsList className="grid grid-cols-3 bg-gray-100 p-1 rounded-xl mb-4">
-                        <TabsTrigger value="students">Student Report</TabsTrigger>
-                        <TabsTrigger value="employees">Employee Report</TabsTrigger>
-                        <TabsTrigger value="leave">Leave Management</TabsTrigger>
-                    </TabsList>
+                    {/* TABS */}
+                    <Tabs defaultValue="students">
+                        <TabsList className="grid grid-cols-3 bg-gray-100 p-1 rounded-xl mb-4">
+                            <TabsTrigger value="students">Student Report</TabsTrigger>
+                            <TabsTrigger value="employees">Employee Report</TabsTrigger>
+                            <TabsTrigger value="leave">Leave Management</TabsTrigger>
+                        </TabsList>
 
-                    <TabsContent value="students">
-                        {kanbanMode ? (
-                            <TakeAttendanceTable type="Student" date={selectedDate} />
-                        ) : (
-                            <StudentReport
-                                date={selectedDate}
-                                attendance={attendance}
-                                loading={loading}
-                                error={error}
-                            />
-                        )}
-                    </TabsContent>
+                        <TabsContent value="students">
+                            {kanbanMode ? (
+                                <TakeAttendanceTable type="Student" date={selectedDate} data={classroom} onTakeAttendance={handleTakeAttendance} />
+                            ) : (
+                                <StudentReport
+                                    date={selectedDate}
+                                    attendance={attendance}
+                                    loading={loading}
+                                    error={error}
+                                />
+                            )}
+                        </TabsContent>
 
-                    <TabsContent value="employees">
-                        <EmployeeReport date={selectedDate} />
-                    </TabsContent>
+                        <TabsContent value="employees">
+                            <EmployeeReport date={selectedDate} />
+                        </TabsContent>
 
-                    <TabsContent value="leave">
-                        <LeaveManagement date={selectedDate} />
-                    </TabsContent>
-                </Tabs>
-            </Card>
-        </div>
-    );
-};
+                        <TabsContent value="leave">
+                            <LeaveManagement date={selectedDate} />
+                        </TabsContent>
+                    </Tabs>
+                </Card>
+            </div>
+        );
+    };
+    
 
-export default AttendancePage;
+    export default AttendancePage;
