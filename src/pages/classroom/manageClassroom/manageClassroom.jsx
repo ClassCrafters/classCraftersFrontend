@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -20,10 +20,13 @@ import { useParams } from "react-router-dom";
 
 import { getClassroomById } from "@/store/slices/classRoomSlice";
 import { getAssignmentsByClassroomId, createAssignment } from "@/store/slices/assignmentSlice";
-
+import { ZegoUIKitPrebuilt } from "@zegocloud/zego-uikit-prebuilt";
 
 
 const ManageClassrooms = () => {
+    const [joining, setJoining] = useState(false);
+    const [zegoJoined, setZegoJoined] = useState(false);
+    const zegoRef = useRef(null);
     const dispatch = useDispatch();
     const { id } = useParams();
 
@@ -33,7 +36,7 @@ const ManageClassrooms = () => {
     );
     const { assignments, loading: assignmentLoading, error: assignmentError } = useSelector(
         (state) => state.assignment);
-    console.log("Assignments:", assignments);
+    // console.log("Assignments:", assignments);
 
     // Local state for modal
     const [open, setOpen] = useState(false);
@@ -52,6 +55,88 @@ const ManageClassrooms = () => {
             dispatch(getAssignmentsByClassroomId(id));
         }
     }, [dispatch, id]);
+
+    const joinLiveClass = async () => {
+        try {
+            const res = await fetch(
+                `http://localhost:5000/api/classrooms/zego/token/${id}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    },
+                }
+            );
+
+            const data = await res.json();
+
+            // ✅ DEFINE appID HERE
+            const appID = Number(import.meta.env.VITE_ZEGO_APP_ID);
+
+            const userID = String(data.userID);
+            const userName = String(data.userName).trim();
+            const roomID = String(data.roomID);
+
+            console.log({ appID, userID, userName, roomID });
+
+            const kitToken = ZegoUIKitPrebuilt.generateKitTokenForTest(
+                appID,      // ✅ now defined
+                userID,
+                userName,
+                roomID
+            );
+
+            const zp = ZegoUIKitPrebuilt.create(kitToken);
+
+            zp.joinRoom({
+                container: document.getElementById("zego-container"),
+                scenario: {
+                    mode: ZegoUIKitPrebuilt.VideoConference,
+                },
+            });
+
+        } catch (err) {
+            console.error("❌ Join failed", err);
+        }
+    };
+
+
+
+
+
+    // const joinLiveClass = async () => {
+
+    //     const res = await fetch(
+    //         `http://localhost:5000/api/classrooms/zego/token/${id}`,
+    //         {
+    //             headers: {
+    //                 Authorization: `Bearer ${localStorage.getItem("token")}`,
+    //             },
+    //         }
+    //     );
+
+    //     if (!res.ok) {
+    //         throw new Error("Failed to get ZEGO token");
+    //     }
+    //     const { token, roomID, userID, userName } = await res.json();
+
+    //     const kitToken = ZegoUIKitPrebuilt.generateKitTokenForProduction(
+    //         Number(import.meta.env.VITE_ZEGO_APP_ID),
+    //         token,
+    //         roomID,
+    //         userID,
+    //         userName
+    //     );
+
+    //     const zp = ZegoUIKitPrebuilt.create(kitToken);
+
+    //     zp.joinRoom({
+    //         container: document.getElementById("zego-container"),
+    //         scenario: {
+    //             mode: ZegoUIKitPrebuilt.VideoConference,
+    //         },
+    //     });
+    // };
+
 
     // Create Assignment
     const handleCreateAssignment = async (e) => {
@@ -91,18 +176,11 @@ const ManageClassrooms = () => {
                         <h2 className="text-lg font-semibold mb-2">Announcements & Updates</h2>
                         <p>This is the classroom stream where updates and announcements will appear.</p>
 
-                        {/* Google Meet Section */}
-                        <div className="mt-4 p-4 border rounded-lg shadow-sm bg-gray-50">
-                            <h3 className="text-md font-medium mb-2">Live Class Session</h3>
-                            <p>Join the live class using Google Meet below:</p>
-                            <a
-                                href="https://meet.google.com/yxt-qepq-gbv"  // Replace with your Google Meet link
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-block mt-3 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-                            >
-                                Join Google Meet
-                            </a>
+
+                        <div className="my-4">
+                            <Button onClick={joinLiveClass} disabled={joining || zegoJoined}>
+                                {joining ? "Joining Live Class..." : zegoJoined ? "Live Class Joined" : "Join Live Class"}
+                            </Button>
                         </div>
                     </TabsContent>
 

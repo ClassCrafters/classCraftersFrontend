@@ -13,6 +13,9 @@ import ManageClassroom from "../pages/classroom/manageClassroom/manageClassroom"
 import PaymentListByInstitutionPage from "../pages/payment/paymentList/paymentListByInstitution";
 import ProfilePage from "@/pages/settings/profile";
 import LoginPage from "@/pages/login";
+import LobbyPage from "../components/videoStream/lobby";
+import RoomPage from "../components/videoStream/room";
+
 
 import HorizontalLayout from "@/layouts/horizontal";
 
@@ -55,7 +58,9 @@ const AppRouter = () => {
               <Route path="/payment/fee-structure" element={<PaymentPage />} />
               <Route path="/settings/profile" element={<ProfilePage />} />
               <Route path="/students/attendance" element={<AttendancePage />} />
-            </Route>
+              <Route path="/video-stream/lobby" element={<LobbyPage />} />
+              <Route path="/video-stream/room/:roomId" element={<RoomPage />} />
+          </Route>
 
           </Route>
         </Route>
