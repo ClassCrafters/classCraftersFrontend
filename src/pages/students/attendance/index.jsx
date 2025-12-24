@@ -8,10 +8,12 @@ import {
   XCircle,
   MoreVertical,
 } from "lucide-react";
+import {useNavigate} from "react-router-dom";
 
 export default function Attendance() {
   const [openMenu, setOpenMenu] = useState(false);
   const menuRef = useRef(null);
+  const navigate = useNavigate();
 
   
 
@@ -38,7 +40,10 @@ export default function Attendance() {
         {/* More menu */}
         <div className="relative" ref={menuRef}>
           <button
-            onClick={() => setOpenMenu((prev) => !prev)}
+            onClick={() => {
+              setOpenMenu((prev) => !prev);
+              navigate('/students/attendance/manage');
+            }}
             className="p-2 rounded-lg hover:bg-gray-100 transition"
           >
             <MoreVertical size={20} />
