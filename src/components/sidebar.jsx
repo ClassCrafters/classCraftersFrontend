@@ -52,6 +52,14 @@ const Sidebar = () => {
       ],
     },
 
+        {
+      label: "Messenger",
+      icon: <Settings size={20} />,
+      children: [
+        { href: "/messenger/list", label: "Profile" },
+      ],
+    },
+
     {
       label: "Settings",
       icon: <Settings size={20} />,
