@@ -35,7 +35,7 @@ const AppRouter = () => {
         {/* =============================
             PROTECTED ROUTES
         ============================== */}
-        <Route element={<ProtectedRoute allowedRoles={["Admin","Teacher","Student"]} />}>
+        <Route element={<ProtectedRoute allowedRoles={["Admin", "Teacher", "Student"]} />}>
           <Route element={<HorizontalLayout />}>
 
             {/* Dashboard (all roles) */}
@@ -60,17 +60,17 @@ const AppRouter = () => {
             <Route element={<ProtectedRoute allowedRoles={["Student", "Teacher", "Admin"]} />}>
               <Route path="/payment/fee-structure" element={<PaymentPage />} />
               <Route path="/settings/profile" element={<ProfilePage />} />
-              <Route path="/students/attendance" element={<AttendancePage/>} />
+              <Route path="/students/attendance" element={<AttendancePage />} />
               <Route path="/students/attendance/manage" element={<ManageAttendancePage />} />
               <Route path="/video-stream/lobby" element={<LobbyPage />} />
               <Route path="/video-stream/room/:roomId" element={<RoomPage />} />
-          </Route>
-              <Route path="/students/attendance" element={<AttendancePage />} />
-              <Route path="/messenger/list" element={<MessengerPage />} />
             </Route>
-
+            <Route path="/students/attendance" element={<AttendancePage />} />
+            <Route path="/messenger/list" element={<MessengerPage />} />
           </Route>
-    
+
+        </Route>
+
 
       </Routes>
     </BrowserRouter>
