@@ -21,12 +21,16 @@ import { useParams } from "react-router-dom";
 import { getClassroomById } from "@/store/slices/classRoomSlice";
 import { getAssignmentsByClassroomId, createAssignment } from "@/store/slices/assignmentSlice";
 import { ZegoUIKitPrebuilt } from "@zegocloud/zego-uikit-prebuilt";
-
+import LobbyPage from "@/components/videoStream/lobby.jsx";
+import { Excalidraw } from "@excalidraw/excalidraw";
+// Use the package export for the CSS so bundler        s (Vite) can resolve it via the package's "exports" field.
+import "@excalidraw/excalidraw/index.css";
 
 const ManageClassrooms = () => {
     const [joining, setJoining] = useState(false);
     const [zegoJoined, setZegoJoined] = useState(false);
     const zegoRef = useRef(null);
+    const excalidrawRef = useRef(null);
     const dispatch = useDispatch();
     const { id } = useParams();
 
@@ -152,6 +156,86 @@ const ManageClassrooms = () => {
         }
     };
 
+    // Whiteboard helpers (Excalidraw)
+    const WHITEBOARD_KEY = `classroom_${id}_whiteboard`;
+
+    const loadWhiteboard = async () => {
+        if (!excalidrawRef.current) return;
+        try {
+            const raw = localStorage.getItem(WHITEBOARD_KEY);
+            if (!raw) return;
+            const parsed = JSON.parse(raw);
+            // updateScene expects elements and optional appState
+            await excalidrawRef.current.updateScene({ elements: parsed.elements || [] });
+        } catch (err) {
+            console.error("Failed to load whiteboard", err);
+        }
+    };
+
+    const saveWhiteboard = async (showToast = true) => {
+        if (!excalidrawRef.current) return;
+        try {
+            const elements = await excalidrawRef.current.getSceneElements();
+            const appState = await excalidrawRef.current.getAppState();
+            const payload = { elements, appState, updatedAt: Date.now() };
+            localStorage.setItem(WHITEBOARD_KEY, JSON.stringify(payload));
+            if (showToast) toast.success("Whiteboard saved", { autoClose: 1000 });
+        } catch (err) {
+            console.error("Save whiteboard failed", err);
+            if (showToast) toast.error("Failed to save whiteboard");
+        }
+    };
+
+    const downloadWhiteboard = async () => {
+        try {
+            await saveWhiteboard(false);
+            const raw = localStorage.getItem(WHITEBOARD_KEY);
+            if (!raw) return toast.error("Nothing to download");
+            const blob = new Blob([raw], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `${WHITEBOARD_KEY}.json`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            URL.revokeObjectURL(url);
+        } catch (err) {
+            console.error(err);
+            toast.error("Download failed");
+        }
+    };
+
+    const clearWhiteboard = async () => {
+        if (!excalidrawRef.current) return;
+        try {
+            await excalidrawRef.current.updateScene({ elements: [], commitToHistory: true });
+            localStorage.removeItem(WHITEBOARD_KEY);
+            toast.info("Whiteboard cleared");
+        } catch (err) {
+            console.error(err);
+            toast.error("Failed to clear");
+        }
+    };
+
+    // Autosave every 5 seconds when classroom id is present
+    useEffect(() => {
+        if (!id) return;
+        const iv = setInterval(() => {
+            // silent autosave
+            saveWhiteboard(false);
+        }, 5000);
+        return () => clearInterval(iv);
+    }, [id]);
+
+    // Load saved whiteboard once when id (or ref) is ready
+    useEffect(() => {
+        if (!id) return;
+        // slight delay to allow Excalidraw to mount
+        const t = setTimeout(() => loadWhiteboard(), 300);
+        return () => clearTimeout(t);
+    }, [id]);
+
     // Handle loading & error states
     if (classroomLoading || assignmentLoading) return <p>Loading...</p>;
     if (classroomError) return <p>Error: {classroomError}</p>;
@@ -169,6 +253,8 @@ const ManageClassrooms = () => {
                         <TabsTrigger value="classwork">Classwork</TabsTrigger>
                         <TabsTrigger value="people">People</TabsTrigger>
                         <TabsTrigger value="marks">Marks</TabsTrigger>
+                        <TabsTrigger value="whiteboard">Whiteboard</TabsTrigger>
+
                     </TabsList>
 
                     {/* Stream Tab */}
@@ -178,9 +264,10 @@ const ManageClassrooms = () => {
 
 
                         <div className="my-4">
-                            <Button onClick={joinLiveClass} disabled={joining || zegoJoined}>
+                            <LobbyPage />
+                            {/* <Button onClick={joinLiveClass} disabled={joining || zegoJoined}>
                                 {joining ? "Joining Live Class..." : zegoJoined ? "Live Class Joined" : "Join Live Class"}
-                            </Button>
+                            </Button> */}
                         </div>
                     </TabsContent>
 
@@ -270,6 +357,29 @@ const ManageClassrooms = () => {
                         <h2 className="text-lg font-semibold mb-2">Grades & Marks</h2>
                         <p>Marks and grade reports will be shown here.</p>
                     </TabsContent>
+
+                    {/* Whiteboard Tab */}
+                    <TabsContent value="whiteboard" className="p-4">
+                        <div className="flex flex-col gap-3">
+                            <div className="flex flex-wrap items-center gap-2 mb-2">
+                                <Button onClick={() => saveWhiteboard()}>Save</Button>
+                                <Button onClick={() => loadWhiteboard()}>Load</Button>
+                                <Button onClick={() => downloadWhiteboard()}>Download</Button>
+                                <Button variant="destructive" onClick={() => clearWhiteboard()}>Clear</Button>
+                                <p className="text-sm text-gray-500 ml-2">Autosaves every 5s to your browser (localStorage).</p>
+                            </div>
+
+                            <div className="w-full" style={{ height: '70vh' }}>
+                                <Excalidraw
+                                    ref={excalidrawRef}
+                                    viewModeEnabled={false}
+                                    zenModeEnabled={false}
+                                    style={{ width: '100%', height: '100%' }}
+                                />
+                            </div>
+                        </div>
+                    </TabsContent>
+
                 </Tabs>
             </Card>
         </div>
