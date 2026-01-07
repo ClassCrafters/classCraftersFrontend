@@ -67,9 +67,9 @@ export const startQuiz = createAsyncThunk(
 
 export const submitQuiz = createAsyncThunk(
     "quiz/submitQuiz",
-    async ({ attemptId, answersPayload, token }, { rejectWithValue }) => {
+    async ({ attemptId, answers, token }, { rejectWithValue }) => {
         try {
-            const response = await quizService.submitQuiz(attemptId, answersPayload, token);
+            const response = await quizService.submitQuiz(attemptId, answers, token);
 
             return response;
         }
