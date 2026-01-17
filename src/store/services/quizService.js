@@ -58,6 +58,19 @@ export const getQuiz = async (quizId) => {
     return res.data.quiz;
 };
 
+export const getClassroomQuizzes = async (classroomId) => {
+    const res = await axios.get(
+        `${API_BASE_URL}/quizzes/classrooms/${classroomId}/quizzes`,
+        {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+        }
+    );
+    return res.data.quizzes;
+};
+
+
 export const startQuiz = async (quizId) => {
     const res = await axios.post(
         `${API_BASE_URL}/quizzes/${quizId}/start`,

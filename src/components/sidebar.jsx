@@ -11,6 +11,7 @@ import {
   ChevronUp,
   School,
   Receipt,
+  Presentation
 } from "lucide-react";
 import { Link } from "react-router-dom"; // 🔥 IMPORTANT
 import logo from "@/assets/logo.png";
@@ -26,6 +27,13 @@ const Sidebar = () => {
   const menuItems = [
     { href: "/", label: "Dashboard", icon: <Home size={20} /> },
 
+    {
+      label: "Front Office",
+      icon: <Presentation size={20} />,
+      children: [
+        { href: "/front-office/enquiries", label: "Enquiries" },
+      ],
+    },
     {
       label: "Classrooms",
       icon: <School size={20} />,

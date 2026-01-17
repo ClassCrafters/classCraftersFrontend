@@ -20,8 +20,9 @@ import {
     selectQuizResult,
 } from "../../../store/selectors/quizSelectors";
 
-const QuizAttempt = ({ quizId }) => {
-    quizId = 1; // TEMPORARY FIX FOR TESTING
+const QuizAttempt = ({ classroomId }) => {
+    console.log("Classroom ID in QuizAttempt:", classroomId);
+    const quizId = 1; // TEMPORARY FIX FOR TESTING
     const dispatch = useDispatch();
     const quiz = useSelector(selectQuiz);
     console.log("Quiz Data:", quiz);

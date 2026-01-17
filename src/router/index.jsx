@@ -16,6 +16,7 @@ import ProfilePage from "@/pages/settings/profile";
 import LoginPage from "@/pages/login";
 import LobbyPage from "../components/videoStream/lobby";
 import RoomPage from "../components/videoStream/room";
+import EnquiryPage from "../pages/frontOffice/Enquiry";
 
 import MessengerPage from "../pages/messanger";
 
@@ -64,6 +65,7 @@ const AppRouter = () => {
               <Route path="/students/attendance/manage" element={<ManageAttendancePage />} />
               <Route path="/video-stream/lobby" element={<LobbyPage />} />
               <Route path="/video-stream/room/:roomId" element={<RoomPage />} />
+              <Route path="/front-office/enquiries" element={<EnquiryPage />} />
             </Route>
             <Route path="/students/attendance" element={<AttendancePage />} />
             <Route path="/messenger/list" element={<MessengerPage />} />

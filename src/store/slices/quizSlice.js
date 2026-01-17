@@ -52,6 +52,21 @@ export const getQuiz = createAsyncThunk(
     }
 );
 
+export const getClassroomQuizzes = createAsyncThunk(
+    "quiz/getClassroomQuizzes",
+    async ({ classroomId, token }, { rejectWithValue }) => {
+        try {
+            const response = await quizService.getClassroomQuizzes(classroomId, token);
+            return response;
+        }
+        catch (error) {
+            return rejectWithValue(error.response.data);
+        }
+    }
+);
+
+
+
 export const startQuiz = createAsyncThunk(
     "quiz/startQuiz",
     async ({ quizId, token }, { rejectWithValue }) => {
@@ -83,6 +98,7 @@ const quizSlice = createSlice({
     name: "quiz",
     initialState: {
         data: null,
+        classroomQuizzes: [],
         loading: false,
         error: null,
         attemptId: null,
@@ -140,6 +156,19 @@ const quizSlice = createSlice({
                 state.data = action.payload;
             })
             .addCase(getQuiz.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            });
+        builder
+            .addCase(getClassroomQuizzes.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(getClassroomQuizzes.fulfilled, (state, action) => {
+                state.loading = false;
+                state.classroomQuizzes = action.payload;
+            })
+            .addCase(getClassroomQuizzes.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
             });
