@@ -16,7 +16,7 @@ import ProfilePage from "@/pages/settings/profile";
 import LoginPage from "@/pages/login";
 import LobbyPage from "../components/videoStream/lobby";
 import RoomPage from "../components/videoStream/room";
-import EnquiryPage from "../pages/frontOffice/Enquiry";
+import EnquiryPage from "../pages/frontOffice/enquiry";
 import VisitorBook from "../pages/frontOffice/visitorBook";
 import Dispatch from "../pages/frontOffice/dispatch";
 import PostalReceive from "../pages/frontOffice/receive";
