@@ -42,6 +42,14 @@ const Sidebar = () => {
       ],
     },
 
+{
+    label: "Academics",
+    icon: <BookOpen size={20} />,
+    children: [
+      { href: "/academics/leave-management", label: "Leave Management" },
+    ],
+  },
+
     {
       label: "Payment",
       icon: <Receipt size={20} />,
@@ -59,6 +67,8 @@ const Sidebar = () => {
         { href: "/messenger/list", label: "Profile" },
       ],
     },
+
+
 
     {
       label: "Settings",
