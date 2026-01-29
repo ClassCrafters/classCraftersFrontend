@@ -24,7 +24,7 @@ import { ZegoUIKitPrebuilt } from "@zegocloud/zego-uikit-prebuilt";
 import LobbyPage from "@/components/videoStream/lobby.jsx";
 import { Excalidraw } from "@excalidraw/excalidraw";
 import "@excalidraw/excalidraw/index.css";
-import QuizAttempt from "../quizattempt/QuizAttempt";   
+// import QuizAttempt from "../quizattempt/QuizAttempt";   
 import {selectClassroomQuizzes} from "@/store/selectors/quizSelectors";
 
 
@@ -262,7 +262,7 @@ const ManageClassrooms = () => {
                     
                     {/* Quiz Tab */}
                     <TabsContent value="quiz" className="p-4">
-                        <QuizAttempt quizzData={classroomQuizes} />
+                        {/* <QuizAttempt quizzData={classroomQuizes} /> */}
                     </TabsContent>
 
                     {/* People Tab */}
