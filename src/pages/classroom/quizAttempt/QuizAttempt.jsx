@@ -10,6 +10,7 @@ import {
     getQuiz,
     startQuiz,
     submitQuiz,
+    // getClassroomQuizzes
 } from "../../../store/slices/quizSlice";
 
 import {
@@ -18,10 +19,11 @@ import {
     selectQuizError,
     selectAttemptId,
     selectQuizResult,
+    
 } from "../../../store/selectors/quizSelectors";
 
-const QuizAttempt = ({ classroomId }) => {
-    console.log("Classroom ID in QuizAttempt:", classroomId);
+const QuizAttempt = ({ quizzData }) => {
+    console.log("Classroom quizz data", quizzData);
     const quizId = 1; // TEMPORARY FIX FOR TESTING
     const dispatch = useDispatch();
     const quiz = useSelector(selectQuiz);

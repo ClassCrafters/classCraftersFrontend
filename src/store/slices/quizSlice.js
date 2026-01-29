@@ -1,6 +1,7 @@
 import axios from "axios";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import * as quizService from "../services/quizService";
+import { IdCard } from "lucide-react";
 
 export const createQuiz = createAsyncThunk(
     "quiz/createQuiz",
@@ -54,10 +55,12 @@ export const getQuiz = createAsyncThunk(
 
 export const getClassroomQuizzes = createAsyncThunk(
     "quiz/getClassroomQuizzes",
-    async ({ classroomId, token }, { rejectWithValue }) => {
+    async ( id , { rejectWithValue }) => {
+            console.log("classroomId from slice",id)
+
         try {
-            const response = await quizService.getClassroomQuizzes(classroomId, token);
-            return response;
+            const response = await quizService.getClassroomQuizzes(id);
+            return response.data;
         }
         catch (error) {
             return rejectWithValue(error.response.data);

@@ -58,9 +58,10 @@ export const getQuiz = async (quizId) => {
     return res.data.quiz;
 };
 
-export const getClassroomQuizzes = async (classroomId) => {
+export const getClassroomQuizzes = async (id) => {
+    // console.log("classroomId from service",classroomId)
     const res = await axios.get(
-        `${API_BASE_URL}/quizzes/classrooms/${classroomId}/quizzes`,
+        `${API_BASE_URL}/quizzes/classrooms/${id}/quizzes`,
         {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("token")}`,

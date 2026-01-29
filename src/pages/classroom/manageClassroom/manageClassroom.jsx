@@ -17,21 +17,19 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useParams } from "react-router-dom";
-
+import { getClassroomQuizzes} from "@/store/slices/quizSlice"
 import { getClassroomById } from "@/store/slices/classRoomSlice";
 import { getAssignmentsByClassroomId, createAssignment } from "@/store/slices/assignmentSlice";
 import { ZegoUIKitPrebuilt } from "@zegocloud/zego-uikit-prebuilt";
 import LobbyPage from "@/components/videoStream/lobby.jsx";
 import { Excalidraw } from "@excalidraw/excalidraw";
 import "@excalidraw/excalidraw/index.css";
-import QuizAttempt from "../quizAttempt/quizAttempt.jsx";   
-
+import {QuizAttempt} from "../quizAttempt/QuizAttempt";   
+import {selectClassroomQuizzes} from "@/store/selectors/quizSelectors";
 
 
 const ManageClassrooms = () => {
-    const [joining, setJoining] = useState(false);
-    const [zegoJoined, setZegoJoined] = useState(false);
-    const zegoRef = useRef(null);
+ 
     const excalidrawRef = useRef(null);
     const dispatch = useDispatch();
     const { id } = useParams();
@@ -43,7 +41,8 @@ const ManageClassrooms = () => {
     const { assignments, loading: assignmentLoading, error: assignmentError } = useSelector(
         (state) => state.assignment);
     // console.log("Assignments:", assignments);
-
+    const classroomQuizes = useSelector(selectClassroomQuizzes);
+    console.log("ClassroomQuizzes",classroomQuizes)
     // Local state for modal
     const [open, setOpen] = useState(false);
     const [newAssignment, setNewAssignment] = useState({
@@ -59,89 +58,10 @@ const ManageClassrooms = () => {
         if (id) {
             dispatch(getClassroomById(id));
             dispatch(getAssignmentsByClassroomId(id));
+            dispatch(getClassroomQuizzes(id));
         }
     }, [dispatch, id]);
 
-    const joinLiveClass = async () => {
-        try {
-            const res = await fetch(
-                `http://localhost:5000/api/classrooms/zego/token/${id}`,
-                {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem("token")}`,
-                    },
-                }
-            );
-
-            const data = await res.json();
-
-            // ✅ DEFINE appID HERE
-            const appID = Number(import.meta.env.VITE_ZEGO_APP_ID);
-
-            const userID = String(data.userID);
-            const userName = String(data.userName).trim();
-            const roomID = String(data.roomID);
-
-            console.log({ appID, userID, userName, roomID });
-
-            const kitToken = ZegoUIKitPrebuilt.generateKitTokenForTest(
-                appID,      // ✅ now defined
-                userID,
-                userName,
-                roomID
-            );
-
-            const zp = ZegoUIKitPrebuilt.create(kitToken);
-
-            zp.joinRoom({
-                container: document.getElementById("zego-container"),
-                scenario: {
-                    mode: ZegoUIKitPrebuilt.VideoConference,
-                },
-            });
-
-        } catch (err) {
-            console.error("❌ Join failed", err);
-        }
-    };
-
-
-
-
-
-    // const joinLiveClass = async () => {
-
-    //     const res = await fetch(
-    //         `http://localhost:5000/api/classrooms/zego/token/${id}`,
-    //         {
-    //             headers: {
-    //                 Authorization: `Bearer ${localStorage.getItem("token")}`,
-    //             },
-    //         }
-    //     );
-
-    //     if (!res.ok) {
-    //         throw new Error("Failed to get ZEGO token");
-    //     }
-    //     const { token, roomID, userID, userName } = await res.json();
-
-    //     const kitToken = ZegoUIKitPrebuilt.generateKitTokenForProduction(
-    //         Number(import.meta.env.VITE_ZEGO_APP_ID),
-    //         token,
-    //         roomID,
-    //         userID,
-    //         userName
-    //     );
-
-    //     const zp = ZegoUIKitPrebuilt.create(kitToken);
-
-    //     zp.joinRoom({
-    //         container: document.getElementById("zego-container"),
-    //         scenario: {
-    //             mode: ZegoUIKitPrebuilt.VideoConference,
-    //         },
-    //     });
-    // };
 
 
     // Create Assignment
@@ -342,7 +262,7 @@ const ManageClassrooms = () => {
                     
                     {/* Quiz Tab */}
                     <TabsContent value="quiz" className="p-4">
-                        <QuizAttempt classroomId={id} />
+                        <QuizAttempt quizzData={classroomQuizes} />
                     </TabsContent>
 
                     {/* People Tab */}
