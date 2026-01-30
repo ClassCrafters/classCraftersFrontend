@@ -20,3 +20,65 @@ export const postAttendanceDataStudents = async (attendanceData) => {
   });
   return response.data;
 }
+
+// export const staffPunchIn = async (data) => {
+//   const res = await axios.post(
+//     `${API_URL}/attendance/staffPunchIn`,
+//     data,
+//     {
+//       headers: {
+//         Authorization: `Bearer ${localStorage.getItem("token")}`,
+//       },
+//     }
+//   );
+//   return res.data;
+// };
+
+// export const staffPunchOut= async (data) => {
+//   const res = await axios.post(
+//     `${API_URL}/attendance/staffPunchout`,
+//     data,
+//     {
+//       headers: {
+//         Authorization: `Bearer ${localStorage.getItem("token")}`,
+//       },
+//     }
+//   );
+//   return res.data;
+// };
+
+// ================= STAFF PUNCH IN =================
+export const staffPunchIn = async (payload) => {
+  const res = await axios.post(
+    `${API_URL}/attendance/staffPunchIn`,
+    {
+      staffRegId: payload.staffRegId,
+      institutionId: payload.institutionId,
+      remarks: payload.remarks || "Null",
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    }
+  );
+  return res.data;
+};
+
+// ================= STAFF PUNCH OUT =================
+export const staffPunchOut = async (payload) => {
+  const res = await axios.post(
+    `${API_URL}/attendance/staffPunchout`,
+    {
+      staffAttendance_id: payload.staffAttendance_id,
+      remarks: payload.remarks || "kuch_ni",
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    }
+  );
+  return res.data;
+};
+

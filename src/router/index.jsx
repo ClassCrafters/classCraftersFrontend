@@ -16,6 +16,8 @@ import ProfilePage from "@/pages/settings/profile";
 import LoginPage from "@/pages/login";
 import LobbyPage from "../components/videoStream/lobby";
 import RoomPage from "../components/videoStream/room";
+import LeaveManagement from "@/pages/academics/LeaveManagement";
+
 import EnquiryPage from "../pages/frontOffice/enquiry";
 import VisitorBook from "../pages/frontOffice/visitorBook";
 import Dispatch from "../pages/frontOffice/dispatch";
@@ -25,7 +27,6 @@ import MessengerPage from "../pages/messanger";
 import Admission from "../pages/students/admission";
 import StudentDetails from "../pages/students/studentDetails"
 
-
 import HorizontalLayout from "@/layouts/horizontal";
 
 import ProtectedRoute from "../router/protectedRoute";
@@ -34,16 +35,18 @@ const AppRouter = () => {
   return (
     <BrowserRouter>
       <Routes>
-
         {/* PUBLIC PAGE */}
         <Route path="/login/auth" element={<LoginPage />} />
 
         {/* =============================
             PROTECTED ROUTES
         ============================== */}
-        <Route element={<ProtectedRoute allowedRoles={["Admin", "Teacher", "Student"]} />}>
+        <Route
+          element={
+            <ProtectedRoute allowedRoles={["Admin", "Teacher", "Student"]} />
+          }
+        >
           <Route element={<HorizontalLayout />}>
-
             {/* Dashboard (all roles) */}
             <Route path="/" element={<IndexPage />} />
 
@@ -54,19 +57,38 @@ const AppRouter = () => {
             </Route>
 
             {/* TEACHER + ADMIN */}
-            <Route element={<ProtectedRoute allowedRoles={["Teacher", "Admin"]} />}>
+            <Route
+              element={<ProtectedRoute allowedRoles={["Teacher", "Admin"]} />}
+            >
               <Route path="/students/list" element={<StudentPage />} />
               <Route path="/classrooms/list" element={<ClassroomPage />} />
-              <Route path="/manage-classrooms/:id" element={<ManageClassroom />} />
+              <Route
+                path="/manage-classrooms/:id"
+                element={<ManageClassroom />}
+              />
               <Route path="/payment/payments" element={<PaymentListPage />} />
-              <Route path="/payment/payments/:institution_id" element={<PaymentListByInstitutionPage />} />
+              <Route
+                path="/payment/payments/:institution_id"
+                element={<PaymentListByInstitutionPage />}
+              />
             </Route>
 
             {/* STUDENT + TEACHER + ADMIN */}
-            <Route element={<ProtectedRoute allowedRoles={["Student", "Teacher", "Admin"]} />}>
+            <Route
+              element={
+                <ProtectedRoute
+                  allowedRoles={["Student", "Teacher", "Admin"]}
+                />
+              }
+            > {/* Academics + Leave Management */}
+          <Route path="academics/leave-management" element={<LeaveManagement />} />
               <Route path="/payment/fee-structure" element={<PaymentPage />} />
               <Route path="/settings/profile" element={<ProfilePage />} />
               <Route path="/students/attendance" element={<AttendancePage />} />
+              <Route
+                path="/students/attendance/manage"
+                element={<ManageAttendancePage />}
+              />
               <Route path="/students/attendance/manage" element={<ManageAttendancePage />} />
               <Route path="/students/admission" element={<Admission />}/>
                <Route path="/students/details/:studentId" element={<StudentDetails />}/>
@@ -83,9 +105,9 @@ const AppRouter = () => {
             <Route path="/messenger/list" element={<MessengerPage />} />
           </Route>
 
+          {/* Academics + Leave Management */}
+          <Route path="academics/leave-management" element={<LeaveManagement />} />
         </Route>
-
-
       </Routes>
     </BrowserRouter>
   );
