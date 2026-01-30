@@ -18,7 +18,14 @@ import LobbyPage from "../components/videoStream/lobby";
 import RoomPage from "../components/videoStream/room";
 import LeaveManagement from "@/pages/academics/LeaveManagement";
 
+import EnquiryPage from "../pages/frontOffice/enquiry";
+import VisitorBook from "../pages/frontOffice/visitorBook";
+import Dispatch from "../pages/frontOffice/dispatch";
+import PostalReceive from "../pages/frontOffice/receive";
+import ComplainPage from "../pages/frontOffice/complain";
 import MessengerPage from "../pages/messanger";
+import Admission from "../pages/students/admission";
+import StudentDetails from "../pages/students/studentDetails"
 
 import HorizontalLayout from "@/layouts/horizontal";
 
@@ -82,8 +89,17 @@ const AppRouter = () => {
                 path="/students/attendance/manage"
                 element={<ManageAttendancePage />}
               />
+              <Route path="/students/attendance/manage" element={<ManageAttendancePage />} />
+              <Route path="/students/admission" element={<Admission />}/>
+               <Route path="/students/details/:studentId" element={<StudentDetails />}/>
               <Route path="/video-stream/lobby" element={<LobbyPage />} />
               <Route path="/video-stream/room/:roomId" element={<RoomPage />} />
+              <Route path="/front-office/enquiries" element={<EnquiryPage />} />
+              <Route path="/front-office/visitor-book" element={<VisitorBook />} />
+              <Route path="/front-office/dispatch" element={<Dispatch />} />
+              <Route path="/front-office/receive" element={<PostalReceive />} />  
+              <Route path="/front-office/complain" element={<ComplainPage />} />
+
             </Route>
             <Route path="/students/attendance" element={<AttendancePage />} />
             <Route path="/messenger/list" element={<MessengerPage />} />

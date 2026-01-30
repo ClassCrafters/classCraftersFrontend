@@ -1,6 +1,7 @@
 import axios from "axios";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import * as quizService from "../services/quizService";
+import { IdCard } from "lucide-react";
 
 export const createQuiz = createAsyncThunk(
     "quiz/createQuiz",
@@ -52,6 +53,23 @@ export const getQuiz = createAsyncThunk(
     }
 );
 
+export const getClassroomQuizzes = createAsyncThunk(
+    "quiz/getClassroomQuizzes",
+    async ( id , { rejectWithValue }) => {
+            console.log("classroomId from slice",id)
+
+        try {
+            const response = await quizService.getClassroomQuizzes(id);
+            return response.data;
+        }
+        catch (error) {
+            return rejectWithValue(error.response.data);
+        }
+    }
+);
+
+
+
 export const startQuiz = createAsyncThunk(
     "quiz/startQuiz",
     async ({ quizId, token }, { rejectWithValue }) => {
@@ -67,9 +85,9 @@ export const startQuiz = createAsyncThunk(
 
 export const submitQuiz = createAsyncThunk(
     "quiz/submitQuiz",
-    async ({ attemptId, answersPayload, token }, { rejectWithValue }) => {
+    async ({ attemptId, answers, token }, { rejectWithValue }) => {
         try {
-            const response = await quizService.submitQuiz(attemptId, answersPayload, token);
+            const response = await quizService.submitQuiz(attemptId, answers, token);
 
             return response;
         }
@@ -83,6 +101,7 @@ const quizSlice = createSlice({
     name: "quiz",
     initialState: {
         data: null,
+        classroomQuizzes: [],
         loading: false,
         error: null,
         attemptId: null,
@@ -140,6 +159,19 @@ const quizSlice = createSlice({
                 state.data = action.payload;
             })
             .addCase(getQuiz.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            });
+        builder
+            .addCase(getClassroomQuizzes.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(getClassroomQuizzes.fulfilled, (state, action) => {
+                state.loading = false;
+                state.classroomQuizzes = action.payload;
+            })
+            .addCase(getClassroomQuizzes.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
             });

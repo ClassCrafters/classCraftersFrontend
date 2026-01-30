@@ -13,6 +13,7 @@ import subGroupReducer from "./slices/subGroupSlice";
 import feeStructureReducer from "./slices/feeStructureSlice";
 import attendanceReducer from "./slices/attendanceSlice";
 import quizReducer from "./slices/quizSlice";
+import frontOfficeReducer from "./slices/frontOfficeSlice";
 // import courseReducer from "./slices/courseSlice";
 
 const rootReducer = combineReducers({
@@ -30,6 +31,7 @@ subGroup: subGroupReducer,
 feeStructure: feeStructureReducer,
 attendance: attendanceReducer,
 quiz: quizReducer,
+frontOffice: frontOfficeReducer,
 //   course: courseReducer,
 });
 

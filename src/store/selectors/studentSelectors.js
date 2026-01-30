@@ -6,6 +6,13 @@ export const selectStudentState = (state) => state.student;
 // Get list of students
 export const selectStudents = (state) => state.student.list || [];
 
+//get filterlist of students
+export const selectStudentsFilter = (state) => state.student.filterlist || [];
+
+//get listById of students
+export const selectStudentsByid = (state) => state.student.listById || [];
+
+
 // Get loading status
 export const selectStudentsLoading = (state) => state.student.loading;
 

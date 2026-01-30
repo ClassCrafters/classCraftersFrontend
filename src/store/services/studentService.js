@@ -8,6 +8,34 @@ export const getStudents = async () => {
   return res.data;
 };
 
+export const getStudentsByFilter = async (filterData) => {
+  const res = await axios.get(`${API_BASE_URL}/student-registrations/filter`,
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+
+      },
+      params: filterData
+    }
+  );
+  return res.data;
+}
+
+export const getStudentsById = async (id) => {
+  console.log("id from students",id)
+  const res = await axios.get(`${API_BASE_URL}/student-registrations/${id}`,
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+
+      }
+    }
+  );
+  return res.data;
+}
+
+
+
 // Add new student
 export const createStudent = async (student) => {
   const res = await axios.post(`${API_BASE_URL}/student-registrations`, student);

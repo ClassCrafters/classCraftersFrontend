@@ -2,294 +2,219 @@
 
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+
 import {
-    fetchStudents,
-    addStudent,
-    updateStudent,
-} from "../../store/slices/studentSlice"; // adjust path
-import { fetchAllUser } from "../../store/slices/userSlice";
+  fetchStudents,
+  fetchStudentsFilter,
+} from "../../store/slices/studentSlice";
+
 import { fetchInstitutions } from "../../store/slices/institutionSlice";
 import { fetchPhases } from "../../store/slices/phaseSlice";
-import { fetchSubGroups } from "../../store/slices/subGroupSlice";
-import {
-    Card,
-    CardHeader,
-    CardTitle,
-    CardContent,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import {
-    Table,
-    TableHeader,
-    TableRow,
-    TableHead,
-    TableBody,
-    TableCell,
-} from "@/components/ui/table";
-import { selectStudents } from "../../store/selectors/studentSelectors";
-import { selectUser } from "../../store/selectors/userSelectors";
-import { selectPhases } from "../../store/selectors/phaseSelectors";
-import { selectInstitutions } from "../../store/selectors/institutionSelectors";
-import { selectSubGroups } from "../../store/selectors/subGroupSelectors";
 
 import {
-    Select,
-    SelectTrigger,
-    SelectContent,
-    SelectGroup,
-    SelectLabel,
-    SelectItem,
-    SelectValue,
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+} from "@/components/ui/card";
+
+import { Button } from "@/components/ui/button";
+
+import {
+  Table,
+  TableHeader,
+  TableRow,
+  TableHead,
+  TableBody,
+  TableCell,
+} from "@/components/ui/table";
+
+import {
+  Select,
+  SelectTrigger,
+  SelectContent,
+  SelectItem,
+  SelectValue,
 } from "@/components/ui/select";
 
+import { Label } from "@/components/ui/label";
+
+import { selectStudents } from "../../store/selectors/studentSelectors";
+import { selectInstitutions } from "../../store/selectors/institutionSelectors";
+import { selectPhases } from "../../store/selectors/phaseSelectors";
 
 export default function StudentRegistration() {
-    const dispatch = useDispatch();
-    const students = useSelector(selectStudents);
-    const users = useSelector(selectUser);
-    const institutions = useSelector(selectInstitutions); // Add this line to select institutions from the store
-    const phases = useSelector(selectPhases);
-    const subGroups = useSelector(selectSubGroups);
-    console.log("subGroups:", subGroups);
-    const [form, setForm] = useState({
-        name: "",
-        email: "",
-        user_id: "",
-        institution_id: "",
-        phase_id: "",
-        subgroup_id: "",
-    });
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-    useEffect(() => {
-        dispatch(fetchStudents());
-        dispatch(fetchAllUser());
-        dispatch(fetchInstitutions());
-        dispatch(fetchPhases());
-        dispatch(fetchSubGroups());
-    }, [dispatch]);
+  // 🔴 registrations list
+  const students = useSelector(selectStudents);
 
+  const institutions = useSelector(selectInstitutions);
+  const phases = useSelector(selectPhases);
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
+  // 🔍 Filters (ONLY institution + class)
+  const [filters, setFilters] = useState({
+    institution_id: "",
+    classroom_id: "",
+  });
 
-        // Only convert number fields
-        if (["user_id", "institution_id", "phase_id", "subgroup_id"].includes(name)) {
-            setForm({
-                ...form,
-                [name]: value === "" ? "" : Number(value),
-            });
-        } else {
-            // name, email → remain string
-            setForm({
-                ...form,
-                [name]: value,
-            });
-        }
-    };
+  useEffect(() => {
+    dispatch(fetchStudents());
+    dispatch(fetchInstitutions());
+    dispatch(fetchPhases());
+  }, [dispatch]);
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        try {
-            await dispatch(addStudent(form)).unwrap();
-            alert("Student added successfully!");
-            setForm({
-                name: "",
-                email: "",
-                user_id: "",
-                institution_id: "",
-                phase_id: "",
-                subgroup_id: "",
-            });
-        } catch {
-            alert("Failed to add student.");
-        }
-    };
+  const handleFilterChange = (field, value) => {
+    setFilters((prev) => ({ ...prev, [field]: value }));
+  };
 
-    const handleUpdate = async (id, field, value) => {
-        try {
-            await dispatch(updateStudent({ id, data: { [field]: value } })).unwrap();
-            alert("Student updated!");
-        } catch {
-            alert("Update failed.");
-        }
-    };
-
-    return (
-        <div className="max-w-5xl mx-auto p-6 space-y-8">
-            {/* Add Student Form */}
-            <Card>
-                <CardHeader>
-                    <CardTitle>Add New Student</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4">
-
-                        <div className="space-y-2 col-span-1">
-                            <label className="text-sm font-medium">Name</label>
-                            <Input
-                                type="text"
-                                name="name"
-                                placeholder="Enter name"
-                                value={form.name}
-                                onChange={handleChange}
-
-                            />
-                        </div>
-
-                        <div className="space-y-2 col-span-1">
-                            <label className="text-sm font-medium">Email</label>
-                            <Input
-                                type="email"
-                                name="email"
-                                placeholder="Enter email"
-                                value={form.email}
-                                onChange={handleChange}
-
-                            />
-                        </div>
-
-
-
-                        {/* USER DROPDOWN */}
-                        <Select
-                            value={form.user_id ? String(form.user_id) : ""}
-                            onValueChange={(value) =>
-                                setForm({ ...form, user_id: Number(value) })
-                            }
-                        >
-                            <SelectTrigger className="w-[250px]">
-                                <SelectValue placeholder="Select User" />
-                            </SelectTrigger>
-
-                            <SelectContent>
-                                <SelectGroup>
-                                    <SelectLabel>Users</SelectLabel>
-
-                                    {users?.data?.users?.map((u) => (
-                                        <SelectItem key={u.id} value={String(u.id)}>
-                                            {u.name}
-                                        </SelectItem>
-                                    ))}
-                                </SelectGroup>
-                            </SelectContent>
-                        </Select>
-
-
-
-                        {/* INSTITUTION DROPDOWN */}
-
-                        <Select
-                            value={form.institution_id ? String(form.institution_id) : ""}
-                            onValueChange={(value) =>
-                                setForm({ ...form, institution_id: Number(value) })
-                            }
-                        >
-                            <SelectTrigger className="w-[250px]">
-                                <SelectValue placeholder="Select Institution" />
-                            </SelectTrigger>
-
-                            <SelectContent>
-                                <SelectGroup>
-                                    <SelectLabel>Institutions</SelectLabel>
-
-                                    {institutions.map((u) => (
-                                        <SelectItem key={u.id} value={String(u.id)}>
-                                            {u.name}
-                                        </SelectItem>
-                                    ))}
-                                </SelectGroup>
-                            </SelectContent>
-                        </Select>
-
-
-                        {/* PHASE DROPDOWN */}
-                        <Select
-                            value={form.phase_id ? String(form.phase_id) : ""}
-                            onValueChange={(value) =>
-                                setForm({ ...form, phase_id: Number(value) })
-                            }
-                        >
-                            <SelectTrigger className="w-[250px]">
-                                <SelectValue placeholder="Select Phase" />
-                            </SelectTrigger>
-
-                            <SelectContent>
-                                <SelectGroup>
-                                    <SelectLabel>Phases</SelectLabel>
-
-                                    {phases.map((u) => (
-                                        <SelectItem key={u.id} value={String(u.id)}>
-                                            {u.name}
-                                        </SelectItem>
-                                    ))}
-                                </SelectGroup>
-                            </SelectContent>
-                        </Select>
-                        {/* SUBGROUP DROPDOWN */}
-                        <Select
-                            value={form.subgroup_id ? String(form.subgroup_id) : ""}
-                            onValueChange={(value) =>
-                                setForm({ ...form, subgroup_id: Number(value) })
-                            }
-                        >
-                            <SelectTrigger className="w-[250px]">
-                                <SelectValue placeholder="Select SubGroup" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectGroup>
-                                    <SelectLabel>SubGroups</SelectLabel>
-                                    {subGroups.map((sg) => (
-                                        <SelectItem key={sg.id} value={String(sg.id)}>
-                                            {sg.name}
-                                        </SelectItem>
-                                    ))}
-                                </SelectGroup>
-                            </SelectContent>
-                        </Select>
-
-                        <Button type="submit" className="col-span-2">
-                            Add Student
-                        </Button>
-                    </form>
-
-                </CardContent>
-            </Card>
-
-            {/* Students List */}
-            <Card>
-                <CardHeader>
-                    <CardTitle>Students List</CardTitle>
-                </CardHeader>
-
-                <CardContent>
-                    {/* Scrollable container */}
-                    <div className="max-h-80 overflow-y-auto rounded-md border">
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>User</TableHead>
-                                    <TableHead>Institution</TableHead>
-                                    <TableHead>Phase</TableHead>
-                                    <TableHead>SubGroup</TableHead>
-                                </TableRow>
-                            </TableHeader>
-
-                            <TableBody>
-                                {students.map((s) => (
-                                    <TableRow key={s.id}>
-                                        <TableCell>{s.user?.name || "-"}</TableCell>
-                                        <TableCell>{s.institution?.name || "-"}</TableCell>
-                                        <TableCell>{s.phase?.name || "-"}</TableCell>
-                                        <TableCell>{s.subgroup?.name || "-"}</TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </div>
-                </CardContent>
-            </Card>
-
-        </div>
+  const applyFilters = () => {
+    dispatch(
+      fetchStudentsFilter({
+        institution_id: filters.institution_id || undefined,
+        classroom_id: filters.classroom_id || undefined,
+      })
     );
+  };
+
+  const resetFilters = () => {
+    setFilters({
+      institution_id: "",
+      classroom_id: "",
+    });
+    dispatch(fetchStudents());
+  };
+
+  const viewStudent = (studentId) => {
+   navigate(`/students/details/${studentId}`);
+  };
+
+  return (
+    <div className="max-w-7xl mx-auto p-6 space-y-6">
+
+      {/* FILTERS */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Filter Students</CardTitle>
+        </CardHeader>
+
+        <CardContent>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+
+            {/* Institution */}
+            <div className="space-y-1">
+              <Label>Institution</Label>
+              <Select
+                value={filters.institution_id}
+                onValueChange={(value) =>
+                  handleFilterChange("institution_id", value)
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select institution" />
+                </SelectTrigger>
+                <SelectContent>
+                  {institutions.map((inst) => (
+                    <SelectItem key={inst.id} value={String(inst.id)}>
+                      {inst.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Class */}
+            <div className="space-y-1">
+              <Label>Class</Label>
+              <Select
+                value={filters.classroom_id}
+                onValueChange={(value) =>
+                  handleFilterChange("classroom_id", value)
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select class" />
+                </SelectTrigger>
+                <SelectContent>
+                  {phases.map((phase) => (
+                    <SelectItem key={phase.id} value={String(phase.id)}>
+                      {phase.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <Button onClick={applyFilters} className="w-full">
+              Apply
+            </Button>
+
+            <Button variant="outline" onClick={resetFilters} className="w-full">
+              Reset
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* STUDENTS LIST */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Student Registrations</CardTitle>
+        </CardHeader>
+
+        <CardContent>
+          <div className="max-h-[420px] overflow-y-auto rounded-md border">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Student ID</TableHead>
+                  <TableHead>Institution</TableHead>
+                  <TableHead>Class</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Action</TableHead>
+                </TableRow>
+              </TableHeader>
+
+              <TableBody>
+                {students.length === 0 ? (
+                  <TableRow>
+                    <TableCell
+                      colSpan={5}
+                      className="text-center text-muted-foreground py-10"
+                    >
+                      No students found
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  students.map((reg) => (
+                    <TableRow key={reg.id}>
+                      <TableCell>{reg.student_id}</TableCell>
+                      <TableCell>{reg.institution?.name}</TableCell>
+                      <TableCell>{reg.phase?.name}</TableCell>
+                      <TableCell>
+                        <span className="px-2 py-1 rounded text-xs bg-muted">
+                          {reg.status}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button
+                          size="sm"
+                          onClick={() => viewStudent(reg.student_id)}
+                        >
+                          View
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        </CardContent>
+      </Card>
+
+    </div>
+  );
 }

@@ -1,14 +1,28 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import * as studentService from "../services/studentService";
-import { data } from "react-router-dom";
 
 export const fetchStudents = createAsyncThunk("students/fetch", async () => {
   return await studentService.getStudents();
 });
 
+export const fetchStudentsFilter = createAsyncThunk("students/fetchFilter", async () => {
+  return await studentService.getStudentsByFilter();
+});
+
+
+export const fetchStudentsById = createAsyncThunk("students/fetchById", async (id) => {
+  console.log("id from students slice",id)
+
+  return await studentService.getStudentsById(id);
+
+});
+
+
 export const addStudent = createAsyncThunk("students/add", async (student) => {
   return await studentService.createStudent(student);
+
 });
+
 
 export const updateStudent = createAsyncThunk(
   "students/update",
@@ -26,6 +40,8 @@ const studentSlice = createSlice({
   name: "students",
   initialState: {
     list: [],
+    filterlist: [],
+    listById: [],
     status: "idle",
   },
   reducers: {},
@@ -43,7 +59,17 @@ const studentSlice = createSlice({
       })
       .addCase(deleteStudent.fulfilled, (state, action) => {
         state.list = state.list.filter((s) => s.id !== action.payload);
-      });
+      })
+    builder
+      .addCase(fetchStudentsFilter.fulfilled, (state, action) => {
+        state.filterlist = action.payload.data.registrations;
+      })
+
+    builder
+      .addCase(fetchStudentsById.fulfilled, (state, action) => {
+        state.listById = action.payload.data.registration;
+      })
+      ;
   },
 });
 
