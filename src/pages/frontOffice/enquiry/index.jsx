@@ -46,9 +46,14 @@ import {
 } from "@/store/slices/frontOfficeSlice";
 
 import {
+  fetchAllUser
+} from "@/store/slices/userSlice";
+
+import {
   getClassroom
 } from "@/store/slices/classRoomSlice";
 
+import { selectUser } from "@/store/selectors/userSelectors";
 import {
   selectEnquiries,
   selectFrontOfficeLoading,
@@ -62,10 +67,16 @@ const EnquiryPage = () => {
   const dispatch = useDispatch();
   const enquiries = useSelector(selectEnquiries);
   const classroom = useSelector(selectClassrooms);
-  console.log("classrooms", classroom);
+  const user = useSelector(selectUser);
+  console.log("user", user);
   const loading = useSelector(selectFrontOfficeLoading);
 
-  const { register, handleSubmit, reset, setValue } = useForm();
+  const { register, handleSubmit, reset, setValue, watch } = useForm({
+    defaultValues: {
+      classroomId: "",
+      assignedUserId: "",
+    },
+  });
   const [isFormOpen, setIsFormOpen] = useState(false);
 
   const [filters, setFilters] = useState({
@@ -81,40 +92,42 @@ const EnquiryPage = () => {
   useEffect(() => {
     dispatch(getAllEnquiries());
     dispatch(getClassroom());
+    dispatch(fetchAllUser());
   }, [dispatch]);
 
   /* =======================
      CREATE ENQUIRY
   ======================== */
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     const convertedData = {
       ...data,
       classroomId: Number(data.classroomId),
       assignedUserId: Number(data.assignedUserId),
     };
-    dispatch(createEnquiry(convertedData)).then((result) => {
-      console.log("Dispatch result:", result);
-      if (result.type === "frontOffice/createEnquiry/fulfilled") {
-        Swal.fire({
-          icon: "success",
-          title: "Success!",
-          text: "Enquiry created successfully",
-          confirmButtonText: "OK",
-        }).then(() => {
-          reset();
-          setIsFormOpen(false);
-          dispatch(getAllEnquiries());
-        });
-      } else if (result.type === "frontOffice/createEnquiry/rejected") {
-        Swal.fire({
-          icon: "error",
-          title: "Error!",
-          text: result.payload?.message || "Failed to create enquiry",
-          confirmButtonText: "OK",
-        });
-      }
-    });
+
+    try {
+      await dispatch(createEnquiry(convertedData)).unwrap();
+
+      Swal.fire({
+        icon: "success",
+        title: "Success!",
+        text: "Enquiry created successfully",
+        confirmButtonText: "OK",
+      });
+
+      reset();
+      setIsFormOpen(false); // ✅ close form
+      dispatch(getAllEnquiries());
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Error!",
+        text: error?.message || "Failed to create enquiry",
+        confirmButtonText: "OK",
+      });
+    }
   };
+
 
   /* =======================
      APPLY FILTER
@@ -133,78 +146,111 @@ const EnquiryPage = () => {
     dispatch(getAllEnquiries());
   };
 
+  const classroomId = watch("classroomId");
+  const assignedUserId = watch("assignedUserId");
   return (
     <div className="max-w-7xl mx-auto p-6 space-y-10">
 
       <div className="flex justify-between items-center">
         <h1 className="text-4xl font-bold text-gray-900">Enquiries</h1>
-         <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
-        <DialogTrigger asChild>
-          <Button>Create Enquiry</Button>
-        </DialogTrigger>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Create New Enquiry</DialogTitle>
-            <DialogDescription>
-              Fill in the form below to create a new enquiry
-            </DialogDescription>
-          </DialogHeader>
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            className="grid grid-cols-1 md:grid-cols-2 gap-4"
-          >
-            <Input placeholder="Name" {...register("name", { required: true })} />
-            <Input placeholder="Phone" {...register("phone", { required: true })} />
-            <Input placeholder="Email" {...register("email")} />
-            <Textarea placeholder="Address" {...register("address")} />
-            <Textarea placeholder="Description" {...register("description")} className="md:col-span-2" />
+        <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+          <DialogTrigger asChild>
+            <Button>Create Enquiry</Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Create New Enquiry</DialogTitle>
+              <DialogDescription>
+                Fill in the form below to create a new enquiry
+              </DialogDescription>
+            </DialogHeader>
+            <form
+              onSubmit={handleSubmit(onSubmit)}
+              className="grid grid-cols-1 md:grid-cols-2 gap-4"
+            >
+              <Input placeholder="Name" {...register("name", { required: true })} />
+              <Input placeholder="Phone" {...register("phone", { required: true })} />
+              <Input placeholder="Email" {...register("email")} />
+              <Textarea placeholder="Address" {...register("address")} />
+              <Textarea placeholder="Description" {...register("description")} className="md:col-span-2" />
 
-            <Select onValueChange={(v) => setValue("source", v)}>
-              <SelectTrigger>
-                <SelectValue placeholder="Enquiry Source" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="WEBSITE">Website</SelectItem>
-                <SelectItem value="WALK_IN">Walk-in</SelectItem>
-                <SelectItem value="PHONE">Phone</SelectItem>
-                <SelectItem value="WHATSAPP">WhatsApp</SelectItem>
-              </SelectContent>
-            </Select>
+              <Select onValueChange={(v) => setValue("source", v)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Enquiry Source" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="WEBSITE">Website</SelectItem>
+                  <SelectItem value="WALK_IN">Walk-in</SelectItem>
+                  <SelectItem value="PHONE">Phone</SelectItem>
+                  <SelectItem value="WHATSAPP">WhatsApp</SelectItem>
+                </SelectContent>
+              </Select>
 
-            <Input
+              {/* <Input
               type="number"
               placeholder="Classroom ID"
               {...register("classroomId", { required: true })}
-            />
-            <Input
-              type="number"
-              placeholder="Assigned User ID"
-              {...register("assignedUserId", { required: true })}
-            />
+            /> */}
 
-            <div className="md:col-span-2 flex gap-3">
-              <Button
-                type="submit"
-                className="flex-1"
-                disabled={loading}
+              <Select
+                value={classroomId}
+                onValueChange={(v) => setValue("classroomId", v)}
               >
-                {loading ? "Saving..." : "Create Enquiry"}
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setIsFormOpen(false)}
-                className="flex-1"
+                <SelectTrigger>
+                  <SelectValue placeholder="Select Classroom" />
+                </SelectTrigger>
+
+                <SelectContent>
+                  {classroom?.map((cls) => (
+                    <SelectItem key={cls.id} value={String(cls.id)}>
+                      {cls.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <Select
+                value={assignedUserId}
+                onValueChange={(v) => setValue("assignedUserId", v)}
               >
-                Cancel
-              </Button>
-            </div>
-          </form>
-        </DialogContent>
-      </Dialog>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select User" />
+                </SelectTrigger>
+
+                <SelectContent>
+                  {user?.data?.users?.map((v) => (
+                    <SelectItem key={v.id} value={String(v.id)}>
+                      {v.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+
+
+              <div className="md:col-span-2 flex gap-3">
+                <Button
+                  type="submit"
+                  className="flex-1"
+                  disabled={loading}
+                >
+                  {loading ? "Saving..." : "Create Enquiry"}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsFormOpen(false)}
+                  className="flex-1"
+                >
+                  Cancel
+                </Button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
       {/* ================= CREATE ENQUIRY BUTTON ================= */}
-     
+
 
       {/* ================= FILTERS ================= */}
       <Card>
