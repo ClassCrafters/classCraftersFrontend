@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { use, useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { addStudent } from "@/store/slices/studentSlice";
 import { toast } from "sonner";
@@ -21,6 +21,20 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+
+import { selectClassrooms } from "../../../store/selectors/classRoomSelectors";
+import { selectPhases } from "../../../store/selectors/phaseSelectors";
+import { selectSubGroups } from "../../../store/selectors/subGroupSelectors";
+import { selectInstitutions } from "../../../store/selectors/institutionSelectors";
+import { selectUser } from "../../../store/selectors/userSelectors";
+
+
+import { getClassroom } from "../../../store/slices/classRoomSlice";
+import { fetchPhases } from "../../../store/slices/phaseSlice";
+import { fetchSubGroups } from "../../../store/slices/subGroupSlice";
+import { fetchInstitutions } from "../../../store/slices/institutionSlice";
+import { fetchAllUser } from "../../../store/slices/userSlice";
+
 
 /* 🔁 Initial state for reset */
 const initialFormData = {
@@ -54,6 +68,22 @@ const initialFormData = {
 
 const Admission = () => {
   const dispatch = useDispatch();
+  const classrooms = useSelector(selectClassrooms);
+  const phases = useSelector(selectPhases);
+  const subGroups = useSelector(selectSubGroups);
+  const institutions = useSelector(selectInstitutions);
+  const users = useSelector(selectUser);
+
+
+
+  useEffect(() => {
+    dispatch(getClassroom());
+    dispatch(fetchPhases());
+    dispatch(fetchSubGroups());
+    dispatch(fetchInstitutions());
+    dispatch(fetchAllUser());
+  }, [dispatch]);
+
 
   /* ⏳ Redux loading state */
   const loading = useSelector(
@@ -72,28 +102,23 @@ const Admission = () => {
     }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+ const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    const resultAction = await dispatch(addStudent(formData));
+  try {
+    await dispatch(addStudent(formData)).unwrap();
 
-    /* ✅ SUCCESS */
-    if (addStudent.fulfilled.match(resultAction)) {
-      toast.success("Admission successful 🎉", {
-        description: "Student registered successfully",
-      });
+    toast.success("Admission successful 🎉", {
+      description: "Student registered successfully",
+    });
 
-      setFormData(initialFormData); // reset form
-    }
-
-    /* ❌ ERROR */
-    if (addStudent.rejected.match(resultAction)) {
-      toast.error("Registration failed ❌", {
-        description:
-          resultAction.payload?.message || "Something went wrong",
-      });
-    }
-  };
+    setFormData(initialFormData); // reset form
+  } catch (error) {
+    toast.error("Registration failed ❌", {
+      description: error?.message || "Something went wrong",
+    });
+  }
+};
 
   return (
     <div className="max-w-6xl mx-auto p-6">
@@ -214,27 +239,66 @@ const Admission = () => {
               </div>
             </section>
 
+            <section>
+              <h2 className="text-lg font-semibold mb-4">Parent</h2>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Input
+                  placeholder="Guardian Name"
+                  value={formData.parent.guardianName}
+                  onChange={(e) =>
+                    handleChange("parent", "guardianName", e.target.value)
+                  }
+                />
+
+                <Input
+                  placeholder="Phone"
+                  value={formData.parent.phone}
+                  onChange={(e) =>
+                    handleChange("parent", "phone", e.target.value)
+                  }
+                />
+              </div>
+            </section>
+
             {/* REGISTRATION */}
             <section>
               <h2 className="text-lg font-semibold mb-4">Registration</h2>
 
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                {/* Academic Session ID (if static, keep input) */}
                 <Input
                   placeholder="Academic Session ID"
                   value={formData.registration.academic_sessionId}
                   onChange={(e) =>
-                    handleChange("registration", "academic_sessionId", e.target.value)
+                    handleChange(
+                      "registration",
+                      "academic_sessionId",
+                      e.target.value
+                    )
                   }
                 />
 
-                <Input
-                  placeholder="Class ID"
-                  value={formData.registration.classroom_id}
-                  onChange={(e) =>
-                    handleChange("registration", "classroom_id", e.target.value)
+                {/* Classroom */}
+                <Select
+                  value={String(formData.registration.classroom_id || "")}
+                  onValueChange={(value) =>
+                    handleChange("registration", "classroom_id", value)
                   }
-                />
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select Classroom" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {classrooms?.map((cls) => (
+                      <SelectItem key={cls.id} value={String(cls.id)}>
+                        {cls.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
 
+                {/* Section (if you don’t have section selector, keep input) */}
                 <Input
                   placeholder="Section ID"
                   value={formData.registration.section_id}
@@ -243,6 +307,7 @@ const Admission = () => {
                   }
                 />
 
+                {/* Roll Number */}
                 <Input
                   placeholder="Roll Number"
                   value={formData.registration.rollNumber}
@@ -251,38 +316,83 @@ const Admission = () => {
                   }
                 />
 
-                <Input
-                  placeholder="User ID"
-                  value={formData.registration.user_id}
-                  onChange={(e) =>
-                    handleChange("registration", "user_id", e.target.value)
+                {/* User */}
+                <Select
+                  value={String(formData.registration.user_id || "")}
+                  onValueChange={(value) =>
+                    handleChange("registration", "user_id", value)
                   }
-                />
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select User" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {users?.data?.users.map((user) => (
+                      <SelectItem key={user.id} value={String(user.id)}>
+                        {user.name || user.email}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
 
-                <Input
-                  placeholder="Institution ID"
-                  value={formData.registration.institution_id}
-                  onChange={(e) =>
-                    handleChange("registration", "institution_id", e.target.value)
+                {/* Institution */}
+                <Select
+                  value={String(formData.registration.institution_id || "")}
+                  onValueChange={(value) =>
+                    handleChange("registration", "institution_id", value)
                   }
-                />
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select Institution" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {institutions?.map((inst) => (
+                      <SelectItem key={inst.id} value={String(inst.id)}>
+                        {inst.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
 
-                <Input
-                  placeholder="Phase ID"
-                  value={formData.registration.phase_id}
-                  onChange={(e) =>
-                    handleChange("registration", "phase_id", e.target.value)
+                {/* Phase */}
+                <Select
+                  value={String(formData.registration.phase_id || "")}
+                  onValueChange={(value) =>
+                    handleChange("registration", "phase_id", value)
                   }
-                />
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select Phase" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {phases?.map((phase) => (
+                      <SelectItem key={phase.id} value={String(phase.id)}>
+                        {phase.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
 
-                <Input
-                  placeholder="Subgroup ID"
-                  value={formData.registration.subgroup_id}
-                  onChange={(e) =>
-                    handleChange("registration", "subgroup_id", e.target.value)
+                {/* Subgroup */}
+                <Select
+                  value={String(formData.registration.subgroup_id || "")}
+                  onValueChange={(value) =>
+                    handleChange("registration", "subgroup_id", value)
                   }
-                />
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select Subgroup" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {subGroups?.map((group) => (
+                      <SelectItem key={group.id} value={String(group.id)}>
+                        {group.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
 
+                {/* Status */}
                 <Select
                   value={formData.registration.status}
                   onValueChange={(value) =>
@@ -300,6 +410,7 @@ const Admission = () => {
                 </Select>
               </div>
             </section>
+
 
             {/* SUBMIT */}
             <div className="flex justify-end">

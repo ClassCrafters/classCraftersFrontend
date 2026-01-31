@@ -51,7 +51,7 @@ import {
 const VisitorBook = () => {
   const dispatch = useDispatch();
   const visitorBook = useSelector(selectVisitorBook);
-//   console.log("Visitor Book Data:", visitorBook);
+  //   console.log("Visitor Book Data:", visitorBook);
   const loading = useSelector(selectVisitorBookLoading);
   const error = useSelector(selectVisitorBookError);
 
@@ -70,14 +70,13 @@ const VisitorBook = () => {
   /* =======================
      CREATE VISITOR ENTRY
   ======================== */
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     setIsSubmitting(true);
-    
-    // Convert datetime-local format to ISO-8601 format
+
+    // Convert datetime-local format to ISO-8601
     const convertDateTimeToISO = (dateTimeLocal) => {
       if (!dateTimeLocal) return new Date().toISOString();
-      const date = new Date(dateTimeLocal);
-      return date.toISOString();
+      return new Date(dateTimeLocal).toISOString();
     };
 
     const convertedData = {
@@ -91,29 +90,32 @@ const VisitorBook = () => {
       date: convertDateTimeToISO(data.date),
       inTime: convertDateTimeToISO(data.inTime),
     };
-    dispatch(createVisitorEntry(convertedData)).then((result) => {
+
+    try {
+      await dispatch(createVisitorEntry(convertedData)).unwrap();
+
+      Swal.fire({
+        icon: "success",
+        title: "Success!",
+        text: "Visitor entry created successfully",
+        confirmButtonText: "OK",
+      });
+
+      reset();
+      setIsFormOpen(false); // ✅ close form
+      dispatch(getAllVisitorEntries());
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Error!",
+        text: error?.message || "Failed to create visitor entry",
+        confirmButtonText: "OK",
+      });
+    } finally {
       setIsSubmitting(false);
-      if (result.type === "frontOffice/createVisitorEntry/fulfilled") {
-        Swal.fire({
-          icon: "success",
-          title: "Success!",
-          text: "Visitor entry created successfully",
-          confirmButtonText: "OK",
-        }).then(() => {
-          reset();
-          setIsFormOpen(false);
-          dispatch(getAllVisitorEntries());
-        });
-      } else if (result.type === "frontOffice/createVisitorEntry/rejected") {
-        Swal.fire({
-          icon: "error",
-          title: "Error!",
-          text: result.payload?.message || "Failed to create visitor entry",
-          confirmButtonText: "OK",
-        });
-      }
-    });
+    }
   };
+
 
   /* =======================
      HANDLE EXIT VISITOR
@@ -216,10 +218,10 @@ const VisitorBook = () => {
                 </SelectTrigger>
                 <SelectContent>
                   {/* <SelectItem value="ADMIN">Admin</SelectItem> */}
-                  <SelectItem value="PRINCIPAL">Principal</SelectItem>
+                  {/* <SelectItem value="PRINCIPAL">Principal</SelectItem> */}
                   <SelectItem value="STAFF">Staff</SelectItem>
                   <SelectItem value="STUDENT">Student</SelectItem>
-                  <SelectItem value="OTHER">Other</SelectItem>
+                  {/* <SelectItem value="OTHER">Other</SelectItem> */}
                 </SelectContent>
               </Select>
               <Select onValueChange={(v) => setValue("idCard", v)}>
