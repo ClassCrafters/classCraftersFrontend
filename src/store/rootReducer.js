@@ -16,6 +16,7 @@ import quizReducer from "./slices/quizSlice";
 import frontOfficeReducer from "./slices/frontOfficeSlice";
 import timeTableReducer from "./slices/timeTableSlice";
 import staffReducer from "./slices/staffSlice";
+import leaveReducer from "./slices/leaveSlice";
 // import courseReducer from "./slices/courseSlice";
 
 const rootReducer = combineReducers({
@@ -36,6 +37,7 @@ attendance: attendanceReducer,
 quiz: quizReducer,
 frontOffice: frontOfficeReducer,
 timeTable: timeTableReducer,
+leave: leaveReducer,
 //   course: courseReducer,
 });
 

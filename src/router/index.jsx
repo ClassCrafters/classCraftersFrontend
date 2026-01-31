@@ -16,7 +16,7 @@ import ProfilePage from "@/pages/settings/profile";
 import LoginPage from "@/pages/login";
 import LobbyPage from "../components/videoStream/lobby";
 import RoomPage from "../components/videoStream/room";
-import LeaveManagement from "@/pages/academics/LeaveManagement";
+import LeaveManagement from "@/pages/academics/leave/LeaveManagement";
 
 import EnquiryPage from "../pages/frontOffice/enquiry";
 import VisitorBook from "../pages/frontOffice/visitorBook";
