@@ -244,7 +244,7 @@ export const createComplaintEntry = createAsyncThunk(
         try {
             const response = await frontOfficeService.createComplaint(complaintData);
             return response;
-        }   
+        }
         catch (error) {
             return rejectWithValue(error.response?.data || { message: "Failed to create complaint entry" });
         }
@@ -281,7 +281,7 @@ export const updateComplaintEntry = createAsyncThunk(
     "frontOffice/updateComplaintEntry",
     async ({ complaintId, updateData }, { rejectWithValue }) => {
 
-        try {   
+        try {
             const response = await frontOfficeService.updateComplaint(complaintId, updateData);
             return response;
         }
@@ -374,7 +374,7 @@ const frontOfficeSlice = createSlice({
             })
             .addCase(createVisitorEntry.fulfilled, (state, action) => {
                 state.loading = false;
-                state.visitorBook.push(action.payload);
+                state.visitorBook = action.payload.visitorBook;
             })
             .addCase(createVisitorEntry.rejected, (state, action) => {
                 state.loading = false;
@@ -428,7 +428,7 @@ const frontOfficeSlice = createSlice({
             }
             )
             .addCase(visitorExit.fulfilled, (state, action) => {
-                state.loading = false;  
+                state.loading = false;
                 const index = state.visitorBook.findIndex(visitor => visitor.id === action.payload.id);
                 if (index !== -1) {
                     state.visitorBook[index] = action.payload;
@@ -439,10 +439,10 @@ const frontOfficeSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload;
             });
-            builder.addCase(createDispatchEntry.pending, (state) => {
-                state.loading = true;
-                state.error = null;
-            })
+        builder.addCase(createDispatchEntry.pending, (state) => {
+            state.loading = true;
+            state.error = null;
+        })
             .addCase(createDispatchEntry.fulfilled, (state, action) => {
                 state.loading = false;
                 state.dispatchPostal.push(action.payload);
