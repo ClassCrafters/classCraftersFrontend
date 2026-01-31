@@ -50,3 +50,13 @@ export const deleteUser = async (id) => {
     },
   });
 };
+
+export const getTeacher = async () => {
+ const res = await axios.get(`${API_BASE_URL}/users/teacher`,{ 
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+  });
+  console.log("data from teacher service",res)
+  return res.data;
+};

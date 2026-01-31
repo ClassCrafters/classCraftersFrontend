@@ -62,9 +62,22 @@ export const deleteUser = createAsyncThunk(
   }
 );
 
+export const fetchTeacher = createAsyncThunk(
+  "user/fetchTeacher",
+  async (_, { rejectWithValue }) => {
+    try {
+      const data = await userService.getTeacher();
+      return data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data || "Error fetching user");
+    }
+  }
+);
+
 // --- Initial state ---
 const initialState = {
-  data: [],       // 👈 should be array of users
+  data: [], // 👈 should be array of users
+  dataTeacher: [],
   loading: false,
   error: null,
 };
@@ -120,6 +133,19 @@ const userSlice = createSlice({
       // deleteUser
       .addCase(deleteUser.fulfilled, (state, action) => {
         state.data = state.data.filter((u) => u.id !== action.payload);
+      });
+    builder
+      .addCase(fetchTeacher.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchTeacher.fulfilled, (state, action) => {
+        state.loading = true;
+        state.dataTeacher = action.payload;
+      })
+      .addCase(fetchTeacher.rejected, (state, action) => {
+        state.loading = true;
+        state.error = action.payload;
       });
   },
 });

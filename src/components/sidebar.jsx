@@ -62,6 +62,7 @@ const Sidebar = () => {
         { href: "/teacher/timetable", label: "Teacher Timetable" },
         { href: "/classrooms/list", label: "Classrooms" },
         { href: "/subjects", label: "Subjects" },
+        { href: "/academics/leave-management", label: "Leave Management" }
       ],
     },
 
@@ -82,6 +83,8 @@ const Sidebar = () => {
         { href: "/messenger/list", label: "Profile" },
       ],
     },
+
+
 
     {
       label: "Settings",
