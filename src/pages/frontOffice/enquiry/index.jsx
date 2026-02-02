@@ -37,7 +37,7 @@ import {
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, Eye } from "lucide-react";
 
 import {
   createEnquiry,
@@ -68,7 +68,6 @@ const EnquiryPage = () => {
   const enquiries = useSelector(selectEnquiries);
   const classroom = useSelector(selectClassrooms);
   const user = useSelector(selectUser);
-  console.log("user", user);
   const loading = useSelector(selectFrontOfficeLoading);
 
   const { register, handleSubmit, reset, setValue, watch } = useForm({
@@ -85,6 +84,13 @@ const EnquiryPage = () => {
     fromDate: "",
     toDate: "",
   });
+
+const [openEnquiryView, setOpenEnquiryView] = useState(false);
+  const [selectedEnquiry, setSelectedEnquiry] = useState(null);
+  const handleView = (enquiry) => {
+    setSelectedEnquiry(enquiry);
+    setOpenEnquiryView(true);
+  }
 
   /* =======================
      INITIAL LOAD
@@ -364,6 +370,111 @@ const EnquiryPage = () => {
         <CardHeader>
           <CardTitle>Enquiries</CardTitle>
         </CardHeader>
+
+        <Dialog open={openEnquiryView} onOpenChange={setOpenEnquiryView}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Enquiry Details</DialogTitle>
+              <DialogDescription>
+                Complete enquiry information
+              </DialogDescription>
+            </DialogHeader>
+
+            {selectedEnquiry && (
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                {/* Name */}
+                <div>
+                  <p className="font-medium">Name</p>
+                  <p className="text-gray-600">{selectedEnquiry.name}</p>
+                </div>
+
+                {/* Phone */}
+                <div>
+                  <p className="font-medium">Phone</p>
+                  <p className="text-gray-600">{selectedEnquiry.phone}</p>
+                </div>
+
+                {/* Email */}
+                <div>
+                  <p className="font-medium">Email</p>
+                  <p className="text-gray-600">
+                    {selectedEnquiry.email || "—"}
+                  </p>
+                </div>
+
+                {/* Address */}
+                <div>
+                  <p className="font-medium">Address</p>
+                  <p className="text-gray-600">
+                    {selectedEnquiry.address || "—"}
+                  </p>
+                </div>
+
+                {/* Classroom */}
+                <div>
+                  <p className="font-medium">Classroom</p>
+                  <p className="text-gray-600">
+                    {selectedEnquiry.classroom?.name || "—"}
+                  </p>
+                </div>
+
+                {/* Assigned User */}
+                <div>
+                  <p className="font-medium">Assigned To</p>
+                  <p className="text-gray-600">
+                    {selectedEnquiry.assignedUser?.name || "—"}
+                  </p>
+                </div>
+
+                {/* Source */}
+                <div>
+                  <p className="font-medium">Source</p>
+                  <p className="text-gray-600">
+                    {selectedEnquiry.source || "—"}
+                  </p>
+                </div>
+
+                {/* Status */}
+                <div>
+                  <p className="font-medium">Status</p>
+                  <p className="text-gray-600">
+                    {selectedEnquiry.status}
+                  </p>
+                </div>
+
+                {/* Enquiry Date */}
+                <div>
+                  <p className="font-medium">Enquiry Date</p>
+                  <p className="text-gray-600">
+                    {new Date(selectedEnquiry.enquiryDate).toLocaleDateString()}
+                  </p>
+                </div>
+
+                {/* Next Follow-up */}
+                <div>
+                  <p className="font-medium">Next Follow-up</p>
+                  <p className="text-gray-600">
+                    {selectedEnquiry.nextFollowUpDate
+                      ? new Date(
+                        selectedEnquiry.nextFollowUpDate
+                      ).toLocaleDateString()
+                      : "—"}
+                  </p>
+                </div>
+
+                {/* Description */}
+                <div className="col-span-2">
+                  <p className="font-medium">Description</p>
+                  <p className="mt-1 text-gray-600">
+                    {selectedEnquiry.description || "—"}
+                  </p>
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
+
+
         <CardContent>
           <Table>
             <TableHeader>
@@ -373,6 +484,7 @@ const EnquiryPage = () => {
                 <TableHead>Status</TableHead>
                 <TableHead>Class</TableHead>
                 <TableHead>Date</TableHead>
+                <TableHead>Action</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -394,6 +506,16 @@ const EnquiryPage = () => {
                   <TableCell>{e.classroomId}</TableCell>
                   <TableCell>
                     {new Date(e.enquiryDate).toLocaleDateString()}
+                  </TableCell>
+                  <TableCell className="space-x-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleView(e)}
+                      className="inline-flex items-center"
+                    >
+                      <Eye className="h-4 w-4" />
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))}
