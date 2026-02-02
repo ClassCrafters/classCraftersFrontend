@@ -31,7 +31,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { AlertCircle, LogOut, Plus, RefreshCw } from "lucide-react";
+import { AlertCircle, LogOut, Plus, RefreshCw, Eye } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 import {
@@ -59,6 +59,13 @@ const VisitorBook = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [filterType, setFilterType] = useState("all");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [openVisitorView, setOpenVisitorView] = useState(false);
+  const [selectedVisitor, setSelectedVisitor] = useState(null);
+
+  const handleView = (visitor) => {
+    setSelectedVisitor(visitor);
+    setOpenVisitorView(true);
+  };
 
   /* =======================
      INITIAL LOAD
@@ -333,6 +340,104 @@ const VisitorBook = () => {
             Visitor Records ({visitorBook?.data?.length || 0})
           </CardTitle>
         </CardHeader>
+
+        <Dialog open={openVisitorView} onOpenChange={setOpenVisitorView}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Visitor Details</DialogTitle>
+              <DialogDescription>
+                Complete visitor book information
+              </DialogDescription>
+            </DialogHeader>
+
+            {selectedVisitor && (
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                {/* Visitor Name */}
+                <div>
+                  <p className="font-medium">Visitor Name</p>
+                  <p className="text-gray-600">
+                    {selectedVisitor.visitorName}
+                  </p>
+                </div>
+
+                {/* Phone */}
+                <div>
+                  <p className="font-medium">Phone</p>
+                  <p className="text-gray-600">
+                    {selectedVisitor.phone}
+                  </p>
+                </div>
+
+                {/* Purpose */}
+                <div>
+                  <p className="font-medium">Purpose</p>
+                  <p className="text-gray-600">
+                    {selectedVisitor.purpose}
+                  </p>
+                </div>
+
+                {/* Meeting With */}
+                <div>
+                  <p className="font-medium">Meeting With</p>
+                  <p className="text-gray-600">
+                    {selectedVisitor.meetingWith}
+                  </p>
+                </div>
+
+                {/* ID Card */}
+                <div>
+                  <p className="font-medium">ID Card</p>
+                  <p className="text-gray-600">
+                    {selectedVisitor.idCard}
+                  </p>
+                </div>
+
+                {/* Number of Persons */}
+                <div>
+                  <p className="font-medium">No. of Persons</p>
+                  <p className="text-gray-600">
+                    {selectedVisitor.numberOfPerson}
+                  </p>
+                </div>
+
+                {/* Visit Date */}
+                <div>
+                  <p className="font-medium">Visit Date</p>
+                  <p className="text-gray-600">
+                    {new Date(selectedVisitor.date).toLocaleDateString()}
+                  </p>
+                </div>
+
+                {/* In Time */}
+                <div>
+                  <p className="font-medium">In Time</p>
+                  <p className="text-gray-600">
+                    {new Date(selectedVisitor.inTime).toLocaleTimeString()}
+                  </p>
+                </div>
+
+                {/* Out Time */}
+                <div>
+                  <p className="font-medium">Out Time</p>
+                  <p className="text-gray-600">
+                    {selectedVisitor.outTime
+                      ? new Date(selectedVisitor.outTime).toLocaleTimeString()
+                      : "—"}
+                  </p>
+                </div>
+
+                {/* Note */}
+                <div className="col-span-2">
+                  <p className="font-medium">Note</p>
+                  <p className="mt-1 text-gray-600">
+                    {selectedVisitor.note || "—"}
+                  </p>
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
+
         <CardContent>
           <div className="overflow-x-auto">
             {loading && (
@@ -359,7 +464,7 @@ const VisitorBook = () => {
                     <TableHead className="font-semibold">Persons</TableHead>
                     <TableHead className="font-semibold">Check-in Time</TableHead>
                     <TableHead className="font-semibold">Status</TableHead>
-                    <TableHead className="font-semibold">Actions</TableHead>
+                    <TableHead className="text-right font-semibold">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -403,6 +508,16 @@ const VisitorBook = () => {
                             Exit
                           </Button>
                         )}
+                      </TableCell>
+                      <TableCell className="text-left space-x-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleView(visitor)}
+                          className="inline-flex items-center"
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
                       </TableCell>
                     </TableRow>
                   ))}

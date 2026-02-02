@@ -18,7 +18,8 @@ import {
     DialogContent,
     DialogHeader,
     DialogTitle,
-    DialogTrigger
+    DialogTrigger,
+    DialogDescription
 } from '../../../components/ui/dialog';
 import { Input } from '../../../components/ui/input';
 import { Textarea } from '../../../components/ui/textarea';
@@ -39,15 +40,29 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from '../../../components/ui/alert-dialog';
-import { Trash2, Edit2, Plus, Loader2 } from 'lucide-react';
+import {
+    Select,
+    SelectTrigger,
+    SelectValue,
+    SelectContent,
+    SelectItem,
+} from "@/components/ui/select";
+import { Trash2, Edit2, Plus, Loader2, Eye } from 'lucide-react';
 import { toast } from 'sonner';
 
-const PostalReceive = () => {
+const ComplainPage = () => {
     const dispatch = useDispatch();
     const complaints = useSelector(selectComplaints);
     console.log("complaint receive:", complaints)
     const loading = useSelector(selectComplaintLoading);
     const error = useSelector(selectComplaintError);
+    const [openView, setOpenView] = useState(false);
+    const [selectedComplaint, setSelectedComplaint] = useState(null);
+
+    const handleView = (item) => {
+        setSelectedComplaint(item);
+        setOpenView(true);
+    };
 
     const [open, setOpen] = useState(false);
     const [editingId, setEditingId] = useState(null);
@@ -196,24 +211,42 @@ const PostalReceive = () => {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
                                         <label className="form-label">Complaint *</label>
-                                        <Input
-                                            name="complaint"
-                                            placeholder="Eg: Fee issue, Transport issue"
+                                        <Select
                                             value={formData.complaint}
-                                            onChange={handleInputChange}
-                                            required
-                                        />
+                                            onValueChange={(value) =>
+                                                setFormData({ ...formData, complaint: value })
+                                            }
+                                        >
+                                            <SelectTrigger className="w-full">
+                                                <SelectValue placeholder="Select complaint type" />
+                                            </SelectTrigger>
+
+                                            <SelectContent>
+                                                <SelectItem value="EXAMLEAK">Examleak</SelectItem>
+                                                <SelectItem value="MISBEHAVE">Misbehavior</SelectItem>
+                                                <SelectItem value="ABUSE">Abuse</SelectItem>
+                                            </SelectContent>
+                                        </Select>
                                     </div>
 
                                     <div>
                                         <label className="form-label">Source *</label>
-                                        <Input
-                                            name="source"
-                                            placeholder="Parent / Student / Staff"
+                                        <Select
                                             value={formData.source}
-                                            onChange={handleInputChange}
-                                            required
-                                        />
+                                            onValueChange={(value) =>
+                                                setFormData({ ...formData, source: value })
+                                            }
+                                        >
+                                            <SelectTrigger className="w-full">
+                                                <SelectValue placeholder="Select source" />
+                                            </SelectTrigger>
+
+                                            <SelectContent>
+                                                <SelectItem value="PARENT">Parent</SelectItem>
+                                                <SelectItem value="STUDENT">Student</SelectItem>
+                                                <SelectItem value="STAFF">Staff</SelectItem>
+                                            </SelectContent>
+                                        </Select>
                                     </div>
 
                                     <div>
@@ -253,23 +286,42 @@ const PostalReceive = () => {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
                                         <label className="form-label">Assign To *</label>
-                                        <Input
-                                            name="assign"
-                                            placeholder="Admin / Teacher / Staff"
+                                        <Select
                                             value={formData.assign}
-                                            onChange={handleInputChange}
-                                            required
-                                        />
+                                            onValueChange={(value) =>
+                                                setFormData({ ...formData, assign: value })
+                                            }
+                                        >
+                                            <SelectTrigger className="w-full">
+                                                <SelectValue placeholder="Assign to" />
+                                            </SelectTrigger>
+
+                                            <SelectContent>
+                                                <SelectItem value="ADMIN">Admin</SelectItem>
+                                                <SelectItem value="TEACHER">Teacher</SelectItem>
+                                                <SelectItem value="STAFF">Staff</SelectItem>
+                                            </SelectContent>
+                                        </Select>
                                     </div>
 
                                     <div>
                                         <label className="form-label">Action Taken</label>
-                                        <Input
-                                            name="actionTaken"
-                                            placeholder="Pending / Resolved / In Progress"
+                                        <Select
                                             value={formData.actionTaken}
-                                            onChange={handleInputChange}
-                                        />
+                                            onValueChange={(value) =>
+                                                setFormData({ ...formData, actionTaken: value })
+                                            }
+                                        >
+                                            <SelectTrigger className="w-full">
+                                                <SelectValue placeholder="Select action status" />
+                                            </SelectTrigger>
+
+                                            <SelectContent>
+                                                <SelectItem value="PENDING">Pending</SelectItem>
+                                                <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
+                                                <SelectItem value="RESOLVED">Resolved</SelectItem>
+                                            </SelectContent>
+                                        </Select>
                                     </div>
                                 </div>
 
@@ -318,16 +370,68 @@ const PostalReceive = () => {
                     </Dialog>
                 </div>
 
+                <Dialog open={openView} onOpenChange={setOpenView}>
+                    <DialogContent className="max-w-lg">
+                        <DialogHeader>
+                            <DialogTitle>Complaint Details</DialogTitle>
+                            <DialogDescription>
+                                View complete complaint information
+                            </DialogDescription>
+                        </DialogHeader>
+
+                        {selectedComplaint && (
+                            <div className="space-y-3 text-sm">
+                                <div className="flex justify-between">
+                                    <span className="font-medium">Assigned To:</span>
+                                    <span>{selectedComplaint.assign}</span>
+                                </div>
+
+                                <div className="flex justify-between">
+                                    <span className="font-medium">Complaint By:</span>
+                                    <span>{selectedComplaint.complainBy}</span>
+                                </div>
+
+                                <div className="flex justify-between">
+                                    <span className="font-medium">Source:</span>
+                                    <span>{selectedComplaint.source}</span>
+                                </div>
+
+                                <div className="flex justify-between">
+                                    <span className="font-medium">Date:</span>
+                                    <span>
+                                        {new Date(selectedComplaint.date).toLocaleDateString()}
+                                    </span>
+                                </div>
+
+                                <div>
+                                    <span className="font-medium">Complaint:</span>
+                                    <p className="mt-1 text-gray-600">
+                                        {selectedComplaint.complaint}
+                                    </p>
+                                </div>
+
+                                <div>
+                                    <span className="font-medium">Note:</span>
+                                    <p className="mt-1 text-gray-600">
+                                        {selectedComplaint.note || "—"}
+                                    </p>
+                                </div>
+                            </div>
+                        )}
+                    </DialogContent>
+                </Dialog>
+
+
                 {/* Table - Desktop View */}
                 <div className="hidden md:block bg-white rounded-lg shadow overflow-hidden">
                     {loading && complaints.length === 0 ? (
                         <div className="p-8 text-center">
                             <Loader2 className="h-8 w-8 animate-spin mx-auto text-gray-400 mb-2" />
-                            <p className="text-gray-500">Loading dispatches...</p>
+                            <p className="text-gray-500">Loading complaints...</p>
                         </div>
                     ) : complaints.length === 0 ? (
                         <div className="p-8 text-center">
-                            <p className="text-gray-500">No dispatches found. Create one to get started.</p>
+                            <p className="text-gray-500">No complaints found. Create one to get started.</p>
                         </div>
                     ) : (
                         <Table>
@@ -349,33 +453,52 @@ const PostalReceive = () => {
                                         <TableCell>{item.complainBy}</TableCell>
                                         <TableCell className="max-w-xs truncate">{item.complaint}</TableCell>
                                         <TableCell className="max-w-xs truncate">{item.source}</TableCell>
-                                        <TableCell>{new Date(item.date).toLocaleDateString()}</TableCell>
+                                        <TableCell>
+                                            {new Date(item.date).toLocaleDateString()}
+                                        </TableCell>
                                         <TableCell className="max-w-xs truncate">{item.note}</TableCell>
-                                        <TableCell className="text-right space-x-2">
+
+                                        {/* VIEW */}
+                                        <TableCell className="text-right">
+                                            <Button
+                                                size="sm"
+                                                variant="outline"
+                                                onClick={() => handleView(item)}
+                                                className="inline-flex items-center"
+                                            >
+                                                <Eye className="h-4 w-4" />
+                                            </Button>
+                                        </TableCell>
+
+                                        {/* ACTIONS */}
+                                        <TableCell className="space-x-2">
                                             <Button
                                                 size="sm"
                                                 variant="outline"
                                                 onClick={() => handleEdit(item)}
-                                                className="inline-flex"
+                                                className="inline-flex items-center"
                                             >
                                                 <Edit2 className="h-4 w-4" />
                                             </Button>
+
                                             <AlertDialog>
                                                 <AlertDialogTrigger asChild>
                                                     <Button
                                                         size="sm"
                                                         variant="destructive"
-                                                        className="inline-flex"
+                                                        className="inline-flex items-center"
                                                     >
                                                         <Trash2 className="h-4 w-4" />
                                                     </Button>
                                                 </AlertDialogTrigger>
+
                                                 <AlertDialogContent>
-                                                    <AlertDialogTitle>Delete Dispatch</AlertDialogTitle>
+                                                    <AlertDialogTitle>Delete Complaint</AlertDialogTitle>
                                                     <AlertDialogDescription>
-                                                        Are you sure you want to delete this dispatch? This action cannot be undone.
+                                                        Are you sure you want to delete this complaint? This action cannot be undone.
                                                     </AlertDialogDescription>
-                                                    <div className="flex gap-3">
+
+                                                    <div className="flex gap-3 justify-end">
                                                         <AlertDialogCancel>Cancel</AlertDialogCancel>
                                                         <AlertDialogAction
                                                             onClick={() => handleDelete(item.id)}
@@ -390,6 +513,7 @@ const PostalReceive = () => {
                                     </TableRow>
                                 ))}
                             </TableBody>
+
                         </Table>
                     )}
                 </div>
@@ -477,4 +601,4 @@ const PostalReceive = () => {
     );
 };
 
-export default PostalReceive;
+export default ComplainPage;

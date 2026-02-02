@@ -1,35 +1,36 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { 
-    createReceivePostalEntry, 
-    getAllReceivePostalEntries, 
-    updateReceivePostalEntry, 
-    deleteReceivePostalEntry 
+import {
+    createReceivePostalEntry,
+    getAllReceivePostalEntries,
+    updateReceivePostalEntry,
+    deleteReceivePostalEntry
 } from '../../../store/slices/frontOfficeSlice';
-import { 
-    selectReceivePostal, 
-    selectReceivePostalLoading, 
-    selectReceivePostalError 
+import {
+    selectReceivePostal,
+    selectReceivePostalLoading,
+    selectReceivePostalError
 } from '../../../store/selectors/frontOfficeSelectors';
 import { Button } from '../../../components/ui/button';
-import { 
-    Dialog, 
-    DialogContent, 
-    DialogHeader, 
-    DialogTitle, 
-    DialogTrigger 
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+    DialogDescription 
 } from '../../../components/ui/dialog';
 import { Input } from '../../../components/ui/input';
 import { Textarea } from '../../../components/ui/textarea';
-import { 
-    Table, 
-    TableBody, 
-    TableCell, 
-    TableHead, 
-    TableHeader, 
-    TableRow 
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow
 } from '../../../components/ui/table';
-import { 
+import {
     AlertDialog,
     AlertDialogAction,
     AlertDialogCancel,
@@ -38,13 +39,13 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from '../../../components/ui/alert-dialog';
-import { Trash2, Edit2, Plus, Loader2 } from 'lucide-react';
+import { Trash2, Edit2, Plus, Loader2, Eye } from 'lucide-react';
 import { toast } from 'sonner';
 
 const PostalReceive = () => {
     const dispatch = useDispatch();
     const postalsReceive = useSelector(selectReceivePostal);
-    console.log("postal receive:",postalsReceive)
+    console.log("postal receive:", postalsReceive)
     const loading = useSelector(selectReceivePostalLoading);
     const error = useSelector(selectReceivePostalError);
 
@@ -57,6 +58,14 @@ const PostalReceive = () => {
         toTitle: '',
         date: new Date().toISOString().split('T')[0],
     });
+    const [openReceiveView, setOpenReceiveView] = useState(false);
+    const [selectedReceive, setSelectedReceive] = useState(null);
+
+    const handleReceiveView = (receive) => {
+        setSelectedReceive(receive);
+        setOpenReceiveView(true);
+    };
+
 
     useEffect(() => {
         dispatch(getAllReceivePostalEntries());
@@ -78,7 +87,7 @@ const PostalReceive = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
+
         if (!formData.referenceNo || !formData.address || !formData.toTitle) {
             toast.error('Please fill all required fields');
             return;
@@ -100,7 +109,7 @@ const PostalReceive = () => {
                 await dispatch(createReceivePostalEntry(submitData)).unwrap();
                 toast.success('Dispatch created successfully');
             }
-            
+
             setFormData({
                 referenceNo: '',
                 address: '',
@@ -268,6 +277,62 @@ const PostalReceive = () => {
                     </Dialog>
                 </div>
 
+                <Dialog open={openReceiveView} onOpenChange={setOpenReceiveView}>
+                    <DialogContent className="max-w-lg">
+                        <DialogHeader>
+                            <DialogTitle>Receive Details</DialogTitle>
+                            <DialogDescription>
+                                Complete receive information
+                            </DialogDescription>
+                        </DialogHeader>
+
+                        {selectedReceive && (
+                            <div className="space-y-3 text-sm">
+                                {/* Reference No */}
+                                <div className="flex justify-between">
+                                    <span className="font-medium">Reference No</span>
+                                    <span className="text-gray-600">
+                                        {selectedReceive.referenceNo}
+                                    </span>
+                                </div>
+
+                                {/* To Title */}
+                                <div className="flex justify-between">
+                                    <span className="font-medium">To</span>
+                                    <span className="text-gray-600">
+                                        {selectedReceive.toTitle}
+                                    </span>
+                                </div>
+
+                                {/* Address */}
+                                <div>
+                                    <p className="font-medium">Address</p>
+                                    <p className="mt-1 text-gray-600 whitespace-pre-line">
+                                        {selectedReceive.address}
+                                    </p>
+                                </div>
+
+                                {/* Note */}
+                                <div>
+                                    <p className="font-medium">Note</p>
+                                    <p className="mt-1 text-gray-600 whitespace-pre-line">
+                                        {selectedReceive.note || "—"}
+                                    </p>
+                                </div>
+
+                                {/* Created At */}
+                                <div className="flex justify-between pt-2 border-t">
+                                    <span className="font-medium">Created At</span>
+                                    <span className="text-gray-600">
+                                        {new Date(selectedReceive.created_at).toLocaleDateString()}
+                                    </span>
+                                </div>
+                            </div>
+                        )}
+                    </DialogContent>
+                </Dialog>
+
+
                 {/* Table - Desktop View */}
                 <div className="hidden md:block bg-white rounded-lg shadow overflow-hidden">
                     {loading && postalsReceive.length === 0 ? (
@@ -300,6 +365,14 @@ const PostalReceive = () => {
                                         <TableCell>{new Date(item.date).toLocaleDateString()}</TableCell>
                                         <TableCell className="max-w-xs truncate">{item.note}</TableCell>
                                         <TableCell className="text-right space-x-2">
+                                            <Button
+                                                size="sm"
+                                                variant="outline"
+                                                onClick={() => handleReceiveView(item)}
+                                            >
+                                                <Eye className="h-4 w-4" />
+                                            </Button>
+
                                             <Button
                                                 size="sm"
                                                 variant="outline"
