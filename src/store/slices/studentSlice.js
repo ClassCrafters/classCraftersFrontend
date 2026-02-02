@@ -11,7 +11,7 @@ export const fetchStudentsFilter = createAsyncThunk("students/fetchFilter", asyn
 
 
 export const fetchStudentsById = createAsyncThunk("students/fetchById", async (id) => {
-  console.log("id from students slice",id)
+  console.log("id from students slice", id)
 
   return await studentService.getStudentsById(id);
 
@@ -42,6 +42,7 @@ const studentSlice = createSlice({
     list: [],
     filterlist: [],
     listById: [],
+    selectedStudent: null,
     status: "idle",
   },
   reducers: {},
@@ -65,11 +66,10 @@ const studentSlice = createSlice({
         state.filterlist = action.payload.data.registrations;
       })
 
-    builder
       .addCase(fetchStudentsById.fulfilled, (state, action) => {
-        state.listById = action.payload.data.registration;
-      })
-      ;
+        state.selectedStudent = action.payload.data.registration;
+      });
+    ;
   },
 });
 

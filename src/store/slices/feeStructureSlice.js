@@ -14,6 +14,18 @@ export const createFeeStructure = createAsyncThunk(
   }
 );
 
+export const getFeeStructures = createAsyncThunk(
+  "feeStructure/getFeeStructures",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await feeStructureService.getFeeStructures();
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
 // Create Fee Head
 export const createFeeHead = createAsyncThunk(
   "feeStructure/createFeeHeads",
@@ -97,6 +109,19 @@ const feeStructureSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload;
             })
+
+            //get Fee Structures
+            .addCase(getFeeStructures.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(getFeeStructures.fulfilled, (state, action) => {
+                state.loading = false;
+                state.feeStructures = action.payload;
+            })
+            .addCase(getFeeStructures.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })  
             // Create Fee Head
             .addCase(createFeeHead.pending, (state) => {
                 state.loading = true;

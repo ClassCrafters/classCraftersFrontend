@@ -22,3 +22,6 @@ export const selectStudentsError = (state) => state.student.error;
 // Get student by ID
 export const selectStudentById = (id) => (state) =>
   state.student.list.find((student) => student.id === id);
+
+export const selectSelectedStudent = (state) =>
+  state.student.selectedStudent;

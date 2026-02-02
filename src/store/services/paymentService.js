@@ -34,3 +34,69 @@ export const getPaymentsByInstitutionId = async (institutionId) => {
   );
   return res.data;
 }
+
+export const createFeeAssignment = async (data) => {
+  const res = await axios.post(`${API_BASE_URL}/fee-assignments/assign`, data,
+    {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+  }
+  );
+  return res.data;
+}
+
+export const getFeeAssignments = async () => {
+  const res = await axios.get(`${API_BASE_URL}/fee-assignments`,
+    {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+  }
+  );
+  return res.data;
+}
+
+export const getFeeAssignmentById = async (id) => {
+  const res = await axios.get(`${API_BASE_URL}/fee-assignments/${id}`,
+    {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+  }
+  );
+  return res.data;
+}
+
+export const updateFeeAssignment = async (id, data) => {
+  const res = await axios.put(`${API_BASE_URL}/fee-assignments/${id}`, data,
+    {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+  }
+  );
+  return res.data;
+}
+
+export const deleteFeeAssignment = async (id) => {
+  const res = await axios.delete(`${API_BASE_URL}/fee-assignments/${id}`,
+    {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+  }
+  );
+  return res.data;
+}
+
+export const collectFees = async (data) => {
+  const res = await axios.post(`${API_BASE_URL}/fee-payments/collect`, data,
+    {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+  }
+  );
+  return res.data;
+}

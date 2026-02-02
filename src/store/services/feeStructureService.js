@@ -13,6 +13,17 @@ export const createFeeStructure = async (feeData) => {
     return response.data;
 }
 
+export const getFeeStructures = async () => {
+    const response = await axios.get(`${API_URL}/fee-structures`,
+        {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+        }
+    );
+    return response.data;
+}
+
 export const createFeeHead = async (structureId, heads) => {
     const response = await axios.post(`${API_URL}/fee-structures/2/heads`, {heads:heads},
         {

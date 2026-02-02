@@ -28,6 +28,9 @@ import StudentDetails from "../pages/students/studentDetails";
 import Subjects from "../pages/academics/subjects";
 import TeacherTimeTable from "../pages/academics/teacherTimeTable";
 import StudentTimeTable from "../pages/academics/studentTimeTable";
+import AssignFees from "../pages/payment/assignFees";
+import ManageAssign from "../pages/payment/assignFees/manageAssign";
+import CollectFees from "../pages/payment/collectFees";
 
 import HorizontalLayout from "@/layouts/horizontal";
 
@@ -73,6 +76,10 @@ const AppRouter = () => {
                 path="/payment/payments/:institution_id"
                 element={<PaymentListByInstitutionPage />}
               />
+
+              <Route path="/payment/assign-fees" element={<AssignFees />} />
+              <Route path="/payment/assign-fees/:id" element={<ManageAssign />} />
+              <Route path="/payment/collect-fees" element={<CollectFees />} />
             </Route>
 
             {/* STUDENT + TEACHER + ADMIN */}
