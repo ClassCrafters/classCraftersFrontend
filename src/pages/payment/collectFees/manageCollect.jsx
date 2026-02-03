@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import { toast } from "sonner"; // 🔥 ADD
 
 import { fetchStudentsById } from "../../../store/slices/studentSlice";
 import { selectStudentsByid } from "../../../store/selectors/studentSelectors";
@@ -10,10 +9,7 @@ import {
   getFeeAssignmentById,
   collectFees,
 } from "../../../store/slices/paymentSlice";
-import {
-  selectAssignPayments,
-  selectCollectFeesStatus, // 🔥 ADD
-} from "../../../store/selectors/paymentSelectors";
+import { selectAssignPayments } from "../../../store/selectors/paymentSelectors";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -52,8 +48,6 @@ const ManageCollect = () => {
   const studentResponse = useSelector(selectStudentsByid);
   const feeAssignment = useSelector(selectAssignPayments);
 
-  const collectStatus = useSelector(selectCollectFeesStatus); // 🔥 ADD
-
   const student =
     studentResponse?.data?.registrations?.[0] || null;
 
@@ -73,27 +67,6 @@ const ManageCollect = () => {
     }
   }, [id, dispatch]);
 
-  // 🔥 TOAST AFTER SUCCESS
-  useEffect(() => {
-    if (collectStatus === "succeeded") {
-      toast.success("Payment collected successfully");
-
-      setOpen(false);
-      setForm({
-        amount: "",
-        payment_mode: "",
-        payment_date: "",
-        note: "",
-      });
-
-      dispatch(getFeeAssignmentById(id)); // refresh fee data
-    }
-
-    if (collectStatus === "failed") {
-      toast.error("Failed to collect payment");
-    }
-  }, [collectStatus, dispatch, id]);
-
   const handleCollectFees = () => {
     const payload = {
       fee_assignment_id: feeAssignment.data.id,
@@ -104,39 +77,46 @@ const ManageCollect = () => {
     };
 
     dispatch(collectFees(payload));
+    setOpen(false);
   };
 
   return (
     <div className="p-6 space-y-6">
       <h1 className="text-2xl font-semibold">Manage Collect Fees</h1>
 
-      {/* STUDENT CARD */}
+      {/* ================= STUDENT CARD ================= */}
       {student && (
         <Card>
           <CardHeader>
             <CardTitle>Student Details</CardTitle>
           </CardHeader>
+
           <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
             <div>
               <p className="text-muted-foreground">Roll Number</p>
               <p className="font-medium">{student.rollNumber}</p>
             </div>
+
             <div>
               <p className="text-muted-foreground">Status</p>
               <Badge variant="outline">{student.status}</Badge>
             </div>
+
             <div>
               <p className="text-muted-foreground">Institution</p>
               <p className="font-medium">{student.institution?.name}</p>
             </div>
+
             <div>
               <p className="text-muted-foreground">Phase</p>
               <p className="font-medium">{student.phase?.name}</p>
             </div>
+
             <div>
               <p className="text-muted-foreground">Subgroup</p>
               <p className="font-medium">{student.subgroup?.name}</p>
             </div>
+
             <div>
               <p className="text-muted-foreground">Previous School</p>
               <p className="font-medium">
@@ -147,12 +127,13 @@ const ManageCollect = () => {
         </Card>
       )}
 
-      {/* FEE TABLE */}
+      {/* ================= FEE TABLE ================= */}
       {feeAssignment?.data && (
         <Card>
           <CardHeader>
             <CardTitle>Fee Assignment Details</CardTitle>
           </CardHeader>
+
           <CardContent>
             <div className="rounded-lg border">
               <Table>
@@ -166,23 +147,36 @@ const ManageCollect = () => {
                     <TableHead>Action</TableHead>
                   </TableRow>
                 </TableHeader>
+
                 <TableBody>
                   <TableRow>
                     <TableCell className="font-medium">
                       {feeAssignment.data.fee_structure.name}
                     </TableCell>
-                    <TableCell>{feeAssignment.data.total_amount}</TableCell>
-                    <TableCell>{feeAssignment.data.due_amount}</TableCell>
+
+                    <TableCell>
+                      {feeAssignment.data.total_amount}
+                    </TableCell>
+
+                    <TableCell>
+                      {feeAssignment.data.due_amount}
+                    </TableCell>
+
                     <TableCell>
                       {feeAssignment.data.outstanding_amount}
                     </TableCell>
+
                     <TableCell>
                       <Badge variant="secondary">
                         {feeAssignment.data.status}
                       </Badge>
                     </TableCell>
+
                     <TableCell>
-                      <Button size="sm" onClick={() => setOpen(true)}>
+                      <Button
+                        size="sm"
+                        onClick={() => setOpen(true)}
+                      >
                         Collect Fees
                       </Button>
                     </TableCell>
@@ -194,7 +188,7 @@ const ManageCollect = () => {
         </Card>
       )}
 
-      {/* MODAL */}
+      {/* ================= COLLECT FEES MODAL ================= */}
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
           <DialogHeader>
