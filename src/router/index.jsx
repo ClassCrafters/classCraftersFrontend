@@ -31,6 +31,7 @@ import StudentTimeTable from "../pages/academics/studentTimeTable";
 import AssignFees from "../pages/payment/assignFees";
 import ManageAssign from "../pages/payment/assignFees/manageAssign";
 import CollectFees from "../pages/payment/collectFees";
+import ManageCollect from "../pages/payment/collectFees/manageCollect";
 
 import HorizontalLayout from "@/layouts/horizontal";
 
@@ -80,6 +81,7 @@ const AppRouter = () => {
               <Route path="/payment/assign-fees" element={<AssignFees />} />
               <Route path="/payment/assign-fees/:id" element={<ManageAssign />} />
               <Route path="/payment/collect-fees" element={<CollectFees />} />
+              <Route path="/payment/collect-fees/:id" element={<ManageCollect />} />
             </Route>
 
             {/* STUDENT + TEACHER + ADMIN */}

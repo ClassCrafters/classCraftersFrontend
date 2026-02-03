@@ -91,7 +91,7 @@ export const deleteFeeAssignment = async (id) => {
 }
 
 export const collectFees = async (data) => {
-  const res = await axios.post(`${API_BASE_URL}/fee-payments/collect`, data,
+  const res = await axios.post(`${API_BASE_URL}/fee-assignments/collect`, data,
     {
     headers: {
       Authorization: `Bearer ${localStorage.getItem("token")}`,
