@@ -32,6 +32,7 @@ import AssignFees from "../pages/payment/assignFees";
 import ManageAssign from "../pages/payment/assignFees/manageAssign";
 import CollectFees from "../pages/payment/collectFees";
 import ManageCollect from "../pages/payment/collectFees/manageCollect";
+import SearchDueFees from "../pages/payment/searchDueFees";
 
 import HorizontalLayout from "@/layouts/horizontal";
 
@@ -82,6 +83,7 @@ const AppRouter = () => {
               <Route path="/payment/assign-fees/:id" element={<ManageAssign />} />
               <Route path="/payment/collect-fees" element={<CollectFees />} />
               <Route path="/payment/collect-fees/:id" element={<ManageCollect />} />
+              <Route path="/payment/search-due-fees" element={<SearchDueFees />} />
             </Route>
 
             {/* STUDENT + TEACHER + ADMIN */}

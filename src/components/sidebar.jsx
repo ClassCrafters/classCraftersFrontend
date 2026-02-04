@@ -74,7 +74,8 @@ const Sidebar = () => {
         { href: "/payment/assign-fees", label: "Assign Fees" },
         { href: "/payment/fee-structure", label: "Fee Structure" },
         { href: "/payment/payments", label: "Payments" },
-        { href: "/payment/history", label: "History" },
+        // { href: "/payment/history", label: "History" },
+        { href: "/payment/search-due-fees", label: "Search Due Fees" },
       ],
     },
 
