@@ -125,7 +125,7 @@ export default function LeaveManagement() {
   /* ---------------- Delete Leave ---------------- */
   const handleDelete = async (id) => {
     try {
-      await dispatch(cancelLeave({id})).unwrap();
+      await dispatch(cancelLeave({ id })).unwrap();
       toast.success("Leave deleted successfully");
       dispatch(getAllLeaves());
     } catch (err) {
@@ -292,10 +292,11 @@ export default function LeaveManagement() {
             {leaves?.data?.leaves?.map((leave, index) => (
               <TableRow key={leave.id}>
                 <TableCell>{index + 1}</TableCell>
-                     <TableCell>{leave.applicant.name || "-"}</TableCell>
-                <TableCell>{leave.reviewedBy.name || "-"}</TableCell>
+                <TableCell>{leave.applicant?.name ?? "-"}</TableCell>
+                <TableCell>{leave.reviewedBy?.name ?? "-"}</TableCell>
+
                 <TableCell>{leave.leaveType}</TableCell>
-           
+
                 <TableCell>{(leave.startDate).slice(0, 10)}</TableCell>
                 <TableCell>{(leave.endDate).slice(0, 10)}</TableCell>
                 {/* <TableCell>{leave.endDate}</TableCell> */}
@@ -305,8 +306,8 @@ export default function LeaveManagement() {
                       leave.status === "APPROVED"
                         ? "success"
                         : leave.status === "REJECTED"
-                        ? "destructive"
-                        : "secondary"
+                          ? "destructive"
+                          : "secondary"
                     }
                   >
                     {leave.status}
