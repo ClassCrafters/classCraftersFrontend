@@ -46,16 +46,18 @@ export const createFeeAssignment = async (data) => {
   return res.data;
 }
 
-export const getFeeAssignments = async () => {
-  const res = await axios.get(`${API_BASE_URL}/fee-assignments`,
-    {
+export const getFeeAssignments = async (id) => {
+  const res = await axios.get(`${API_BASE_URL}/fee-assignments`, {
     headers: {
       Authorization: `Bearer ${localStorage.getItem("token")}`,
     },
-  }
-  );
+    params: {
+      student_ids: id, // or [id]
+    },
+  });
+
   return res.data;
-}
+};
 
 export const getFeeAssignmentById = async (id) => {
   const res = await axios.get(`${API_BASE_URL}/fee-assignments/${id}`,

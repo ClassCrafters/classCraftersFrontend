@@ -53,9 +53,9 @@ export const createFeeAssignment = createAsyncThunk(
 
 export const getFeeAssignments = createAsyncThunk(
   "payment/getFeeAssignments",
-  async (_, { rejectWithValue }) => {
+  async (id, { rejectWithValue }) => {
     try {
-      const response = await paymentService.getFeeAssignments();
+      const response = await paymentService.getFeeAssignments(id);
       return response;
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);

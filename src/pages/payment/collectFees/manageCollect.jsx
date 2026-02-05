@@ -6,6 +6,7 @@ import { fetchStudentsById } from "../../../store/slices/studentSlice";
 import { selectStudentsByid } from "../../../store/selectors/studentSelectors";
 
 import {
+  getFeeAssignments,
   getFeeAssignmentById,
   collectFees,
 } from "../../../store/slices/paymentSlice";
@@ -47,6 +48,7 @@ const ManageCollect = () => {
 
   const studentResponse = useSelector(selectStudentsByid);
   const feeAssignment = useSelector(selectAssignPayments);
+  console.log("Student Response:", feeAssignment);
 
   const student =
     studentResponse?.data?.registrations?.[0] || null;
@@ -63,13 +65,13 @@ const ManageCollect = () => {
   useEffect(() => {
     if (id) {
       dispatch(fetchStudentsById(id));
-      dispatch(getFeeAssignmentById(id));
+      dispatch(getFeeAssignments(id));
     }
   }, [id, dispatch]);
 
   const handleCollectFees = () => {
     const payload = {
-      fee_assignment_id: feeAssignment.data.id,
+      fee_assignment_id: feeAssignment?.data?.[0]?.id,
       amount: Number(form.amount),
       payment_mode: form.payment_mode,
       payment_date: form.payment_date,
@@ -128,7 +130,7 @@ const ManageCollect = () => {
       )}
 
       {/* ================= FEE TABLE ================= */}
-      {feeAssignment?.data && (
+      {Array.isArray(feeAssignment?.data) && feeAssignment?.data.length > 0 && (
         <Card>
           <CardHeader>
             <CardTitle>Fee Assignment Details</CardTitle>
@@ -139,7 +141,6 @@ const ManageCollect = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Fee Structure</TableHead>
                     <TableHead>Total</TableHead>
                     <TableHead>Due</TableHead>
                     <TableHead>Outstanding</TableHead>
@@ -149,44 +150,35 @@ const ManageCollect = () => {
                 </TableHeader>
 
                 <TableBody>
-                  <TableRow>
-                    <TableCell className="font-medium">
-                      {feeAssignment.data.fee_structure.name}
-                    </TableCell>
+                  {feeAssignment?.data?.map((fee) => (
+                    <TableRow key={fee.id}>
+                      <TableCell>{fee.total_amount ?? "—"}</TableCell>
+                      <TableCell>{fee.due_amount ?? "—"}</TableCell>
+                      <TableCell>{fee.outstanding_amount ?? "—"}</TableCell>
 
-                    <TableCell>
-                      {feeAssignment.data.total_amount}
-                    </TableCell>
+                      <TableCell>
+                        <Badge variant="secondary">
+                          {fee.status ?? "—"}
+                        </Badge>
+                      </TableCell>
 
-                    <TableCell>
-                      {feeAssignment.data.due_amount}
-                    </TableCell>
-
-                    <TableCell>
-                      {feeAssignment.data.outstanding_amount}
-                    </TableCell>
-
-                    <TableCell>
-                      <Badge variant="secondary">
-                        {feeAssignment.data.status}
-                      </Badge>
-                    </TableCell>
-
-                    <TableCell>
-                      <Button
-                        size="sm"
-                        onClick={() => setOpen(true)}
-                      >
-                        Collect Fees
-                      </Button>
-                    </TableCell>
-                  </TableRow>
+                      <TableCell>
+                        <Button
+                          size="sm"
+                          onClick={() => setOpen(true)}
+                        >
+                          Collect Fees
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
                 </TableBody>
               </Table>
             </div>
           </CardContent>
         </Card>
       )}
+
 
       {/* ================= COLLECT FEES MODAL ================= */}
       <Dialog open={open} onOpenChange={setOpen}>
@@ -216,8 +208,10 @@ const ManageCollect = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="CASH">Cash</SelectItem>
-                <SelectItem value="NETBANKING">Net Banking</SelectItem>
-                <SelectItem value="OTHER">Other</SelectItem>
+                <SelectItem value="BANK">Net Banking</SelectItem>
+                <SelectItem value="ONLINE">ONLINE</SelectItem>
+                <SelectItem value="CHEQUE">Cheque</SelectItem>
+                <SelectItem value="UPI">UPI</SelectItem>
               </SelectContent>
             </Select>
 
