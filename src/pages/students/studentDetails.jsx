@@ -24,6 +24,7 @@ export default function StudentDetails() {
   const navigate = useNavigate();
 
   const registration = useSelector(selectStudentsByid);
+  // console.log("Registration:", registration);
 
   useEffect(() => {
     dispatch(fetchStudentsById(studentId));

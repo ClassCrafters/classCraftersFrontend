@@ -42,7 +42,7 @@ const ManageClassrooms = () => {
         (state) => state.assignment);
     // console.log("Assignments:", assignments);
     const classroomQuizes = useSelector(selectClassroomQuizzes);
-    console.log("ClassroomQuizzes",classroomQuizes)
+    // console.log("ClassroomQuizzes",classroomQuizes)
     // Local state for modal
     const [open, setOpen] = useState(false);
     const [newAssignment, setNewAssignment] = useState({

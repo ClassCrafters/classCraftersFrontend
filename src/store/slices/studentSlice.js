@@ -5,14 +5,19 @@ export const fetchStudents = createAsyncThunk("students/fetch", async () => {
   return await studentService.getStudents();
 });
 
-export const fetchStudentsFilter = createAsyncThunk("students/fetchFilter", async () => {
-  return await studentService.getStudentsByFilter();
-});
+export const fetchStudentsFilter = createAsyncThunk(
+  "students/fetchFilter",
+  async ({ institution_id, classroom_id }) => {
+    return await studentService.getStudentsByFilter(
+      institution_id,
+      classroom_id
+    );
+  }
+);
 
 
-export const fetchStudentsById = createAsyncThunk("students/fetchById", async (id) => {
-  console.log("id from students slice", id)
-
+export const fetchStudentsById = createAsyncThunk("students/fetchById", async (id) => 
+  {
   return await studentService.getStudentsById(id);
 
 });

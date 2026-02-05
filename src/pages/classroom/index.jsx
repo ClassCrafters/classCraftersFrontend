@@ -34,10 +34,10 @@ import "react-toastify/dist/ReactToastify.css";
 export default function ClassroomPage() {
   const dispatch = useDispatch();
   const { classrooms, loading, error } = useSelector((state) => state.classroom);
-  console.log("Classrooms from Redux:", classrooms);
   const [open, setOpen] = useState(false); // create modal
   const [editOpen, setEditOpen] = useState(false); // edit modal
   const [selectedClass, setSelectedClass] = useState(null);
+  console.log("selectedClass:", selectedClass);
 
   const [classes, setClasses] = useState({
     name: "",
@@ -224,9 +224,9 @@ export default function ClassroomPage() {
                     >
                       ✏️ Edit Class
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleDelete(cls.id)}>
+                    {/* <DropdownMenuItem onClick={() => handleDelete(cls.id)}>
                       🗑️ Delete Class
-                    </DropdownMenuItem>
+                    </DropdownMenuItem> */}
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>

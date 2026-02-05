@@ -74,7 +74,15 @@ const Admission = () => {
   const institutions = useSelector(selectInstitutions);
   const users = useSelector(selectUser);
 
+  const academicSessions = [
+    { id: 1, name: "2026–2027" }
+  ];
 
+  const sections = [
+    { id: 1, name: "Section A" },
+    { id: 2, name: "Section B" },
+    { id: 3, name: "Section C" },
+  ];
 
   useEffect(() => {
     dispatch(getClassroom());
@@ -102,23 +110,25 @@ const Admission = () => {
     }));
   };
 
- const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  try {
-    await dispatch(addStudent(formData)).unwrap();
+    try {
+      await dispatch(addStudent(formData)).unwrap();
 
-    toast.success("Admission successful 🎉", {
-      description: "Student registered successfully",
-    });
+      toast.success("Admission successful 🎉", {
+        description: "Student registered successfully",
+      });
 
-    setFormData(initialFormData); // reset form
-  } catch (error) {
-    toast.error("Registration failed ❌", {
-      description: error?.message || "Something went wrong",
-    });
-  }
-};
+      alert("Student registered successfully ✅"); // 👈 ALERT
+
+      setFormData(initialFormData);
+    } catch (error) {
+      toast.error("Registration failed ❌", {
+        description: error?.message || "Something went wrong",
+      });
+    }
+  };
 
   return (
     <div className="max-w-6xl mx-auto p-6">
@@ -267,17 +277,28 @@ const Admission = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 {/* Academic Session ID (if static, keep input) */}
-                <Input
-                  placeholder="Academic Session ID"
-                  value={formData.registration.academic_sessionId}
-                  onChange={(e) =>
+                <Select
+                  value={String(formData.registration.academic_sessionId)}
+                  onValueChange={(value) =>
                     handleChange(
                       "registration",
                       "academic_sessionId",
-                      e.target.value
+                      Number(value) // ✅ send ID as number
                     )
                   }
-                />
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select Academic Session" />
+                  </SelectTrigger>
+
+                  <SelectContent>
+                    {academicSessions.map((session) => (
+                      <SelectItem key={session.id} value={String(session.id)}>
+                        {session.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
 
                 {/* Classroom */}
                 <Select
@@ -299,13 +320,28 @@ const Admission = () => {
                 </Select>
 
                 {/* Section (if you don’t have section selector, keep input) */}
-                <Input
-                  placeholder="Section ID"
-                  value={formData.registration.section_id}
-                  onChange={(e) =>
-                    handleChange("registration", "section_id", e.target.value)
+                <Select
+                  value={String(formData.registration.section_id)}
+                  onValueChange={(value) =>
+                    handleChange(
+                      "registration",
+                      "section_id",
+                      Number(value) // ✅ send ID
+                    )
                   }
-                />
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select Section" />
+                  </SelectTrigger>
+
+                  <SelectContent>
+                    {sections.map((section) => (
+                      <SelectItem key={section.id} value={String(section.id)}>
+                        {section.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
 
                 {/* Roll Number */}
                 <Input

@@ -214,9 +214,9 @@ export const getReceivePostalById = createAsyncThunk(
 
 export const updateReceivePostalEntry = createAsyncThunk(
     "frontOffice/updateReceivePostalEntry",
-    async ({ receiveId, updateData }, { rejectWithValue }) => {
+    async ({ dispatchId, updateData }, { rejectWithValue }) => {
         try {
-            const response = await frontOfficeService.updateReceivePostal(receiveId, updateData);
+            const response = await frontOfficeService.updateReceivePostal(dispatchId, updateData);
             return response;
         }
         catch (error) {
@@ -279,10 +279,10 @@ export const getComplaintById = createAsyncThunk(
 
 export const updateComplaintEntry = createAsyncThunk(
     "frontOffice/updateComplaintEntry",
-    async ({ complaintId, updateData }, { rejectWithValue }) => {
+    async ({ dispatchId, updateData }, { rejectWithValue }) => {
 
         try {
-            const response = await frontOfficeService.updateComplaint(complaintId, updateData);
+            const response = await frontOfficeService.updateComplaint(dispatchId, updateData);
             return response;
         }
         catch (error) {
@@ -561,6 +561,8 @@ const frontOfficeSlice = createSlice({
                 state.loading = false;
                 state.receivePostal = state.receivePostal.filter(receive => receive.id !== action.payload.id);
             })
+
+         
             .addCase(deleteReceivePostalEntry.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;

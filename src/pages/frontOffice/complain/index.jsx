@@ -53,7 +53,6 @@ import { toast } from 'sonner';
 const ComplainPage = () => {
     const dispatch = useDispatch();
     const complaints = useSelector(selectComplaints);
-    console.log("complaint receive:", complaints)
     const loading = useSelector(selectComplaintLoading);
     const error = useSelector(selectComplaintError);
     const [openView, setOpenView] = useState(false);
@@ -142,6 +141,7 @@ const ComplainPage = () => {
     };
 
     const handleEdit = (item) => {
+        setEditingId(item.id);
         setFormData({
             complaint: item.complaint || '',
             source: item.source || '',
@@ -153,7 +153,7 @@ const ComplainPage = () => {
             note: item.note || '',
             date: item.date ? item.date.split('T')[0] : new Date().toISOString().split('T')[0],
         });
-        setEditingId(item.id);
+        
         setOpen(true);
     };
 
@@ -194,7 +194,10 @@ const ComplainPage = () => {
                     </div>
                     <Dialog open={open} onOpenChange={setOpen}>
                         <DialogTrigger asChild>
-                            <Button className="w-full md:w-auto" onClick={() => setEditingId(null)}>
+                            <Button className="w-full md:w-auto" onClick={()=>{
+                                setEditingId(null)
+                                setOpen(true)
+                            }}>
                                 <Plus className="mr-2 h-4 w-4" />
                                 Add Complaint
                             </Button>

@@ -43,9 +43,10 @@ export const getClassroomById = createAsyncThunk(
 // Update Classroom
 export const updateClassroom = createAsyncThunk(
     "classroom/updateClassroom",
-    async ({ id, updates }, { rejectWithValue }) => {
+    async (  updates , { rejectWithValue }) => {
+        console.log("Update Classroom:", updates);
         try {
-            const response = await classroomService.updateClassroom(id, updates);
+            const response = await classroomService.updateClassroom(updates.id, updates);
             return response; // ✅ return updated classroom
         } catch (error) {
             return rejectWithValue(error.response?.data || error.message);

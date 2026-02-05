@@ -8,7 +8,10 @@ export const getStudents = async () => {
   return res.data;
 };
 
-export const getStudentsByFilter = async (filterData) => {
+export const getStudentsByFilter = async (institution_id,classroom_id) => {
+  const filterData = {};
+  if (institution_id) filterData.institution_id = institution_id;
+  if (classroom_id) filterData.classroom_id = classroom_id;
   const res = await axios.get(`${API_BASE_URL}/student-registrations/filter`,
     {
       headers: {

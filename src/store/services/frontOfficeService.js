@@ -264,9 +264,9 @@ export const getComplaintById = async (complaintId) => {
     return res.data;
 }
 
-export const updateComplaint = async (complaintId, updateData) => {
+export const updateComplaint = async (dispatchId, updateData) => {
     const res = await axios.put(
-        `${API_URL}/complains/updateComplain/${complaintId}`,
+        `${API_URL}/complains/updateComplain/${dispatchId}`,
         updateData,
         {
             headers: {  
@@ -278,9 +278,8 @@ export const updateComplaint = async (complaintId, updateData) => {
 }
 
 export const deleteComplaint = async (complaintId) => {
-    const res = await axios.put(
+    const res = await axios.delete(
         `${API_URL}/complains/deleteComplain/${complaintId}`,
-        {},
         {
             headers: {  
                 Authorization: `Bearer ${localStorage.getItem("token")}`,

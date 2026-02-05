@@ -1,22 +1,22 @@
-import {createSlice, createAsyncThunk} from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import * as assignmentService from "../services/assignmentService";
 
 // Create Assignment
 export const createAssignment = createAsyncThunk(
     "assignment/createAssignment",
-    async (assignmentData, {rejectWithValue}) => {
+    async (assignmentData, { rejectWithValue }) => {
         try {
             const response = await assignmentService.createAssignment(assignmentData);
             return response; // ✅ return actual data
         } catch (error) {
             return rejectWithValue(error.response?.data || error.message);
-        }   
+        }
     }
 );
 // Get Assignments by Classroom ID
 export const getAssignmentsByClassroomId = createAsyncThunk(
-    "assignment/getAssignmentsByClassroomId",   
-    async (classroomId, {rejectWithValue}) => {
+    "assignment/getAssignmentsByClassroomId",
+    async (classroomId, { rejectWithValue }) => {
         try {
             const response = await assignmentService.getAssignmentsByClassroomId(classroomId);
             return response; // ✅ return actual data
@@ -27,26 +27,27 @@ export const getAssignmentsByClassroomId = createAsyncThunk(
 );
 const assignmentSlice = createSlice({
     name: "assignments",
-    initialState: { 
+    initialState: {
         assignments: [],
         loading: false,
         error: null,
     },
-    extraReducers: (builder) => {   
+    extraReducers: (builder) => {
         // Create Assignment
         builder
+            // CREATE
             .addCase(createAssignment.pending, (state) => {
                 state.loading = true;
             })
-            .addCase(createAssignment.fulfilled, (state, action) => {
+            .addCase(createAssignment.fulfilled, (state) => {
                 state.loading = false;
-                state.assignments.push(action.payload);
             })
             .addCase(createAssignment.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
             })
-            // Get Assignments by Classroom ID
+
+            // FETCH BY CLASSROOM
             .addCase(getAssignmentsByClassroomId.pending, (state) => {
                 state.loading = true;
             })

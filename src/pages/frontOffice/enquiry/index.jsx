@@ -85,7 +85,7 @@ const EnquiryPage = () => {
     toDate: "",
   });
 
-const [openEnquiryView, setOpenEnquiryView] = useState(false);
+  const [openEnquiryView, setOpenEnquiryView] = useState(false);
   const [selectedEnquiry, setSelectedEnquiry] = useState(null);
   const handleView = (enquiry) => {
     setSelectedEnquiry(enquiry);
@@ -263,107 +263,130 @@ const [openEnquiryView, setOpenEnquiryView] = useState(false);
         <CardHeader>
           <CardTitle>Filter Enquiries</CardTitle>
         </CardHeader>
-        <CardContent className="grid grid-cols-1 md:grid-cols-6 gap-4">
-          <Select
-            value={filters.classroomId}
-            onValueChange={(value) =>
-              setFilters((prev) => ({ ...prev, classroomId: value }))
-            }
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select Classroom" />
-            </SelectTrigger>
-            <SelectContent>
-              {classroom?.map((cls) => (
-                <SelectItem key={cls.id} value={cls.id}>
-                  {cls.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
 
-          <Select
-            value={filters.status}
-            onValueChange={(v) => setFilters({ ...filters, status: v })}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="NEW">NEW</SelectItem>
-              <SelectItem value="FOLLOW_UP">FOLLOW UP</SelectItem>
-              <SelectItem value="CONVERTED">CONVERTED</SelectItem>
-              <SelectItem value="CLOSED">CLOSED</SelectItem>
-            </SelectContent>
-          </Select>
+        <CardContent className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
+          {/* Classroom */}
+          <div className="md:col-span-3">
+            <Select
+              value={filters.classroomId}
+              onValueChange={(value) =>
+                setFilters((prev) => ({ ...prev, classroomId: value }))
+              }
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select Classroom" />
+              </SelectTrigger>
+              <SelectContent>
+                {classroom?.map((cls) => (
+                  <SelectItem key={cls.id} value={String(cls.id)}>
+                    {cls.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className="w-full justify-start text-left font-normal"
-              >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {filters.fromDate
-                  ? format(new Date(filters.fromDate), "PPP")
-                  : "From Date"}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <Calendar
-                mode="single"
-                selected={filters.fromDate ? new Date(filters.fromDate) : undefined}
-                onSelect={(date) =>
-                  setFilters((prev) => ({
-                    ...prev,
-                    fromDate: date ? format(date, "yyyy-MM-dd") : "",
-                  }))
-                }
-                disabled={(date) =>
-                  filters.toDate && date > new Date(filters.toDate)
-                }
-              />
-            </PopoverContent>
-          </Popover>
+          {/* Status */}
+          <div className="md:col-span-2">
+            <Select
+              value={filters.status}
+              onValueChange={(v) =>
+                setFilters((prev) => ({ ...prev, status: v }))
+              }
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="NEW">NEW</SelectItem>
+                <SelectItem value="FOLLOW_UP">FOLLOW UP</SelectItem>
+                <SelectItem value="CONVERTED">CONVERTED</SelectItem>
+                <SelectItem value="CLOSED">CLOSED</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className="w-full justify-start text-left font-normal"
-              >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {filters.toDate
-                  ? format(new Date(filters.toDate), "PPP")
-                  : "To Date"}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <Calendar
-                mode="single"
-                selected={filters.toDate ? new Date(filters.toDate) : undefined}
-                onSelect={(date) =>
-                  setFilters((prev) => ({
-                    ...prev,
-                    toDate: date ? format(date, "yyyy-MM-dd") : "",
-                  }))
-                }
-                disabled={(date) =>
-                  filters.fromDate && date < new Date(filters.fromDate)
-                }
-              />
-            </PopoverContent>
-          </Popover>
+          {/* From Date */}
+          <div className="md:col-span-2">
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="w-full justify-start text-left font-normal"
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {filters.fromDate
+                    ? format(new Date(filters.fromDate), "PPP")
+                    : "From Date"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={filters.fromDate ? new Date(filters.fromDate) : undefined}
+                  onSelect={(date) =>
+                    setFilters((prev) => ({
+                      ...prev,
+                      fromDate: date ? format(date, "yyyy-MM-dd") : "",
+                    }))
+                  }
+                  disabled={(date) =>
+                    filters.toDate && date > new Date(filters.toDate)
+                  }
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
 
-          <Button onClick={applyFilter} className="w-full">
-            Apply
-          </Button>
+          {/* To Date */}
+          <div className="md:col-span-2">
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="w-full justify-start text-left font-normal"
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {filters.toDate
+                    ? format(new Date(filters.toDate), "PPP")
+                    : "To Date"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={filters.toDate ? new Date(filters.toDate) : undefined}
+                  onSelect={(date) =>
+                    setFilters((prev) => ({
+                      ...prev,
+                      toDate: date ? format(date, "yyyy-MM-dd") : "",
+                    }))
+                  }
+                  disabled={(date) =>
+                    filters.fromDate && date < new Date(filters.fromDate)
+                  }
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
 
-          <Button variant="outline" onClick={resetFilter} className="w-full">
-            Reset
-          </Button>
+          {/* Apply */}
+          <div className="md:col-span-1">
+            <Button onClick={applyFilter} className="w-full">
+              Apply
+            </Button>
+          </div>
+
+          {/* Reset */}
+          <div className="md:col-span-1">
+            <Button variant="outline" onClick={resetFilter} className="w-full">
+              Reset
+            </Button>
+          </div>
         </CardContent>
       </Card>
+
+
 
       {/* ================= ENQUIRY LIST ================= */}
       <Card>

@@ -126,6 +126,7 @@ const PostalReceive = () => {
     };
 
     const handleEdit = (item) => {
+        setEditingId(item.id);
         setFormData({
             referenceNo: item.referenceNo || '',
             address: item.address || '',
@@ -133,7 +134,7 @@ const PostalReceive = () => {
             toTitle: item.toTitle || '',
             date: item.date ? item.date.split('T')[0] : new Date().toISOString().split('T')[0],
         });
-        setEditingId(item.id);
+        
         setOpen(true);
     };
 

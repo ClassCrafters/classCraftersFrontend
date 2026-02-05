@@ -40,30 +40,33 @@ import {
 
 import { Label } from "@/components/ui/label";
 
-import { selectStudents } from "../../store/selectors/studentSelectors";
+import { selectStudents, selectStudentsLoading } from "../../store/selectors/studentSelectors";
 import { selectInstitutions } from "../../store/selectors/institutionSelectors";
-import { selectPhases } from "../../store/selectors/phaseSelectors";
+import { selectClassrooms } from "../../store/selectors/classRoomSelectors";
+import { getClassroom } from "../../store/slices/classRoomSlice";
+import { Loader2 } from "lucide-react";
+
+
+
 
 export default function StudentRegistration() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
-  // 🔴 registrations list
   const students = useSelector(selectStudents);
-
+  // console.log("Students:", students);
   const institutions = useSelector(selectInstitutions);
-  const phases = useSelector(selectPhases);
+  const classrooms = useSelector(selectClassrooms);
+  const loading = useSelector(selectStudentsLoading);
 
-  // 🔍 Filters (ONLY institution + class)
   const [filters, setFilters] = useState({
     institution_id: "",
     classroom_id: "",
   });
 
   useEffect(() => {
+    dispatch(getClassroom());
     dispatch(fetchStudents());
     dispatch(fetchInstitutions());
-    dispatch(fetchPhases());
   }, [dispatch]);
 
   const handleFilterChange = (field, value) => {
@@ -88,7 +91,7 @@ export default function StudentRegistration() {
   };
 
   const viewStudent = (studentId) => {
-   navigate(`/students/details/${studentId}`);
+    navigate(`/students/details/${studentId}`);
   };
 
   return (
@@ -138,9 +141,9 @@ export default function StudentRegistration() {
                   <SelectValue placeholder="Select class" />
                 </SelectTrigger>
                 <SelectContent>
-                  {phases.map((phase) => (
-                    <SelectItem key={phase.id} value={String(phase.id)}>
-                      {phase.name}
+                  {classrooms.map((classroom) => (
+                    <SelectItem key={classroom.id} value={String(classroom.id)}>
+                      {classroom.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -171,17 +174,31 @@ export default function StudentRegistration() {
                 <TableRow>
                   <TableHead>Student ID</TableHead>
                   <TableHead>Institution</TableHead>
-                  <TableHead>Class</TableHead>
-                  <TableHead>Status</TableHead>
+                  <TableHead>Roll Number</TableHead>
+                  <TableHead>Student Name</TableHead>
+                  <TableHead>Gender</TableHead>
+                  <TableHead>DOB</TableHead>
                   <TableHead className="text-right">Action</TableHead>
                 </TableRow>
               </TableHeader>
 
               <TableBody>
-                {students.length === 0 ? (
+                {loading ? (
                   <TableRow>
                     <TableCell
-                      colSpan={5}
+                      colSpan={7}
+                      className="py-10 text-center"
+                    >
+                      <div className="flex justify-center items-center gap-2 text-muted-foreground">
+                        <Loader2 className="h-5 w-5 animate-spin" />
+                        Loading students...
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ) : students.length === 0 ? (
+                  <TableRow>
+                    <TableCell
+                      colSpan={7}
                       className="text-center text-muted-foreground py-10"
                     >
                       No students found
@@ -191,12 +208,14 @@ export default function StudentRegistration() {
                   students.map((reg) => (
                     <TableRow key={reg.id}>
                       <TableCell>{reg.student_id}</TableCell>
-                      <TableCell>{reg.institution?.name}</TableCell>
-                      <TableCell>{reg.phase?.name}</TableCell>
+                      <TableCell>{reg.institution?.name ?? "-"}</TableCell>
+                      <TableCell>{reg.rollNumber}</TableCell>
                       <TableCell>
-                        <span className="px-2 py-1 rounded text-xs bg-muted">
-                          {reg.status}
-                        </span>
+                        {reg.student?.firstName} {reg.student?.lastName}
+                      </TableCell>
+                      <TableCell>{reg.student?.gender ?? "-"}</TableCell>
+                      <TableCell>
+                        {reg.student?.dob?.slice(0, 10) ?? "-"}
                       </TableCell>
                       <TableCell className="text-right">
                         <Button
@@ -210,6 +229,7 @@ export default function StudentRegistration() {
                   ))
                 )}
               </TableBody>
+
             </Table>
           </div>
         </CardContent>
