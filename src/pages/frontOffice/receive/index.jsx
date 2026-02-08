@@ -179,7 +179,7 @@ const PostalReceive = () => {
                         <DialogContent className="w-full max-w-md md:max-w-lg">
                             <DialogHeader>
                                 <DialogTitle>
-                                    {editingId ? 'Edit Dispatch' : 'Create New Dispatch'}
+                                    {editingId ? 'Edit Receive Postal' : 'Create New Receive Postal'}
                                 </DialogTitle>
                             </DialogHeader>
                             <form onSubmit={handleSubmit} className="space-y-4">
