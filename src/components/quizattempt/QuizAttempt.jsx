@@ -11,7 +11,7 @@ import {
     startQuiz,
     submitQuiz,
     // getClassroomQuizzes
-} from "../../../store/slices/quizSlice";
+} from "../../store/slices/quizSlice";
 
 import {
     selectQuiz,
@@ -20,7 +20,7 @@ import {
     selectAttemptId,
     selectQuizResult,
     
-} from "../../../store/selectors/quizSelectors";
+} from "../../store/selectors/quizSelectors";
 
 const QuizAttempt = ({ quizzData }) => {
     console.log("Classroom quizz data", quizzData);
