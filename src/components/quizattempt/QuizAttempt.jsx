@@ -24,7 +24,7 @@ import {
 
 const QuizAttempt = ({ quizzData }) => {
     console.log("Classroom quizz data", quizzData);
-    const quizId = 2; // TEMPORARY FIX FOR TESTING
+    const quizId = 1; // TEMPORARY FIX FOR TESTING
     const dispatch = useDispatch();
     const quiz = useSelector(selectQuiz);
     // console.log("Quiz Data:", quiz);
