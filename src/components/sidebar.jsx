@@ -78,6 +78,29 @@ const Sidebar = () => {
         { href: "/payment/search-due-fees", label: "Search Due Fees" },
       ],
     },
+    {
+      label: "Alumni",
+      icon: <Users size={20} />,
+      children: [
+        { href: "/alumni", label: "Alumni" },
+      ],
+    },
+    {
+      label: "Library",
+      icon: <BookOpen size={20} />,
+      children: [
+        { href: "/library", label: "Library" },
+        { href: "/library/booklist", label: "Book List" },
+        { href: "/library/issue-return", label: "Issue Return" },
+      ],
+    },
+    {
+      label: "Inventory",
+      icon: <Receipt size={20} />,
+      children: [
+        { href: "/inventory", label: "Inventory" },
+      ],
+    },
 
     {
       label: "Messenger",
