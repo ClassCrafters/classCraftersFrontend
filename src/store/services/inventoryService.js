@@ -4,10 +4,10 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 /* ================= ADMIN ================= */
 
-export const createBook = async (bookData) => {
+export const createInventory = async (inventoryData) => {
     const res = await axios.post(
-        `${API_BASE_URL}/library/books`,
-        bookData,
+        `${API_BASE_URL}/inventory/inventories`,
+        inventoryData,
         {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -17,9 +17,22 @@ export const createBook = async (bookData) => {
     return res.data;
 };
 
-export const getBooks = async () => {
+export const getInventories = async () => {
     const res = await axios.get(
-        `${API_BASE_URL}/library/books`,
+        `${API_BASE_URL}/inventory/inventories`,
+        {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+        }
+    );
+    // console.log("API Response for getInventories:", res.data);
+    return res.data.inventories;
+};
+
+export const getInventoryById = async (id) => {
+    const res = await axios.get(
+        `${API_BASE_URL}/inventory/inventories/${id}`,
         {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -29,22 +42,22 @@ export const getBooks = async () => {
     return res.data;
 };
 
-export const getBooksByStudent = async (studentId) => {
-    const res = await axios.get(
-        `${API_BASE_URL}/library/books/student/${studentId}`,
+export const updateInventory = async (id, updates) => {
+    const res = await axios.put(
+        `${API_BASE_URL}/inventory/inventories/${id}`,
+        updates,
         {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("token")}`,
             },
         }
     );
-    // console.log("Get Books by Student Response:", res.data);
-    return res.data.data;
+    return res.data;
 };
 
-export const deleteBook = async (id) => {
+export const deleteInventory = async (id) => {
     const res = await axios.delete(
-        `${API_BASE_URL}/library/books/${id}`,
+        `${API_BASE_URL}/inventory/inventories/${id}`,
         {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -54,23 +67,10 @@ export const deleteBook = async (id) => {
     return res.data;
 };
 
-export const issueBook = async (issueData) => {
+export const allocateInventory = async (id, updates) => {
     const res = await axios.post(
-        `${API_BASE_URL}/library/books/issue`,
-        issueData,
-        {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-        }
-    );
-    return res.data;
-};
-
-export const returnBook = async (issueId) => {
-    const res = await axios.post(
-        `${API_BASE_URL}/library/books/return`,
-        { issueId },
+        `${API_BASE_URL}/inventory/inventories/${id}/allocate`,
+        updates,
         {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("token")}`,

@@ -1,193 +1,237 @@
-import { useState } from "react";
-import { useDispatch } from "react-redux";
-import { issueBook, returnBook } from "@/store/slices/librarySlice";
+"use client";
+
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+
+import {
+  fetchStudents,
+  fetchStudentsFilter,
+} from "../../../store/slices/studentSlice";
+
+import { fetchInstitutions } from "../../../store/slices/institutionSlice";
 
 import {
   Card,
   CardHeader,
   CardTitle,
-  CardContent
+  CardContent,
 } from "@/components/ui/card";
 
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+
+import {
+  Table,
+  TableHeader,
+  TableRow,
+  TableHead,
+  TableBody,
+  TableCell,
+} from "@/components/ui/table";
+
+import {
+  Select,
+  SelectTrigger,
+  SelectContent,
+  SelectItem,
+  SelectValue,
+} from "@/components/ui/select";
+
+import { Label } from "@/components/ui/label";
+
+import { selectStudents, selectStudentsLoading } from "../../../store/selectors/studentSelectors";
+import { selectInstitutions } from "../../../store/selectors/institutionSelectors";
+import { selectClassrooms } from "../../../store/selectors/classRoomSelectors";
+import { getClassroom } from "../../../store/slices/classRoomSlice";
 import { Loader2 } from "lucide-react";
 
-const IssueReturn = () => {
+
+export default function IssueReturn() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const students = useSelector(selectStudents);
+  // console.log("Students:", students);
+  const institutions = useSelector(selectInstitutions);
+  const classrooms = useSelector(selectClassrooms);
+  const loading = useSelector(selectStudentsLoading);
 
-  const [issueLoading, setIssueLoading] = useState(false);
-  const [returnLoading, setReturnLoading] = useState(false);
-
-  const [issueForm, setIssueForm] = useState({
-    studentId: "",
-    bookId: "",
-    dueDate: ""
+  const [filters, setFilters] = useState({
+    institution_id: "",
+    classroom_id: "",
   });
 
-  const [returnForm, setReturnForm] = useState({
-    issueId: ""
-  });
+  useEffect(() => {
+    dispatch(getClassroom());
+    dispatch(fetchStudents());
+    dispatch(fetchInstitutions());
+  }, [dispatch]);
 
-  /* ================= ISSUE HANDLER ================= */
-  const handleIssueChange = (e) => {
-    setIssueForm({
-      ...issueForm,
-      [e.target.name]: e.target.value
-    });
+  const handleFilterChange = (field, value) => {
+    setFilters((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleIssueSubmit = async (e) => {
-    e.preventDefault();
-    setIssueLoading(true);
-
-    await dispatch(issueBook({
-      studentId: Number(issueForm.studentId),
-      bookId: Number(issueForm.bookId),
-      dueDate: new Date(issueForm.dueDate).toISOString()
-    }));
-
-    setIssueLoading(false);
-
-    setIssueForm({
-      studentId: "",
-      bookId: "",
-      dueDate: ""
-    });
+  const applyFilters = () => {
+    dispatch(
+      fetchStudentsFilter({
+        institution_id: filters.institution_id || undefined,
+        classroom_id: filters.classroom_id || undefined,
+      })
+    );
   };
 
-  /* ================= RETURN HANDLER ================= */
-  const handleReturnChange = (e) => {
-    setReturnForm({
-      ...returnForm,
-      [e.target.name]: e.target.value
+  const resetFilters = () => {
+    setFilters({
+      institution_id: "",
+      classroom_id: "",
     });
+    dispatch(fetchStudents());
   };
 
-  const handleReturnSubmit = async (e) => {
-    e.preventDefault();
-    setReturnLoading(true);
-
-    await dispatch(returnBook({
-      issueId: Number(returnForm.issueId)
-    }));
-
-    setReturnLoading(false);
-
-    setReturnForm({
-      issueId: ""
-    });
+  const viewStudent = (studentId) => {
+    navigate(`/library/issue-return/manage/${studentId}`);
   };
 
   return (
-    <div className="p-6 grid md:grid-cols-2 gap-6">
+    <div className="max-w-7xl mx-auto p-6 space-y-6">
 
-      {/* ================= ISSUE BOOK CARD ================= */}
-      <Card className="rounded-2xl shadow-md">
+      {/* FILTERS */}
+      <Card>
         <CardHeader>
-          <CardTitle className="text-xl font-semibold">
-            📖 Issue Book
-          </CardTitle>
+          <CardTitle>Filter Students</CardTitle>
         </CardHeader>
 
         <CardContent>
-          <form onSubmit={handleIssueSubmit} className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
 
-            <div className="space-y-2">
-              <Label>Student ID</Label>
-              <Input
-                type="number"
-                name="studentId"
-                value={issueForm.studentId}
-                onChange={handleIssueChange}
-                placeholder="Enter student ID"
-                required
-              />
+            {/* Institution */}
+            <div className="space-y-1">
+              <Label>Institution</Label>
+              <Select
+                value={filters.institution_id}
+                onValueChange={(value) =>
+                  handleFilterChange("institution_id", value)
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select institution" />
+                </SelectTrigger>
+                <SelectContent>
+                  {institutions.map((inst) => (
+                    <SelectItem key={inst.id} value={String(inst.id)}>
+                      {inst.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
-            <div className="space-y-2">
-              <Label>Book ID</Label>
-              <Input
-                type="number"
-                name="bookId"
-                value={issueForm.bookId}
-                onChange={handleIssueChange}
-                placeholder="Enter book ID"
-                required
-              />
+            {/* Class */}
+            <div className="space-y-1">
+              <Label>Class</Label>
+              <Select
+                value={filters.classroom_id}
+                onValueChange={(value) =>
+                  handleFilterChange("classroom_id", value)
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select class" />
+                </SelectTrigger>
+                <SelectContent>
+                  {classrooms.map((classroom) => (
+                    <SelectItem key={classroom.id} value={String(classroom.id)}>
+                      {classroom.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
-            <div className="space-y-2">
-              <Label>Due Date</Label>
-              <Input
-                type="date"
-                name="dueDate"
-                value={issueForm.dueDate}
-                onChange={handleIssueChange}
-                required
-              />
-            </div>
-
-            <Button type="submit" className="w-full rounded-2xl">
-              {issueLoading ? (
-                <>
-                  <Loader2 className="animate-spin h-4 w-4 mr-2" />
-                  Issuing...
-                </>
-              ) : (
-                "Issue Book"
-              )}
+            <Button onClick={applyFilters} className="w-full">
+              Apply
             </Button>
 
-          </form>
+            <Button variant="outline" onClick={resetFilters} className="w-full">
+              Reset
+            </Button>
+          </div>
         </CardContent>
       </Card>
 
-      {/* ================= RETURN BOOK CARD ================= */}
-      <Card className="rounded-2xl shadow-md">
+      {/* STUDENTS LIST */}
+      <Card>
         <CardHeader>
-          <CardTitle className="text-xl font-semibold">
-            🔄 Return Book
-          </CardTitle>
+          <CardTitle>Student Registrations</CardTitle>
         </CardHeader>
 
         <CardContent>
-          <form onSubmit={handleReturnSubmit} className="space-y-4">
+          <div className="max-h-[420px] overflow-y-auto rounded-md border">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Student ID</TableHead>
+                  <TableHead>Institution</TableHead>
+                  <TableHead>Roll Number</TableHead>
+                  <TableHead>Student Name</TableHead>
+                  <TableHead>Gender</TableHead>
+                  <TableHead>DOB</TableHead>
+                  <TableHead className="text-right">Action</TableHead>
+                </TableRow>
+              </TableHeader>
 
-            <div className="space-y-2">
-              <Label>Issue ID</Label>
-              <Input
-                type="number"
-                name="issueId"
-                value={returnForm.issueId}
-                onChange={handleReturnChange}
-                placeholder="Enter issue ID"
-                required
-              />
-            </div>
+              <TableBody>
+                {loading ? (
+                  <TableRow>
+                    <TableCell
+                      colSpan={7}
+                      className="py-10 text-center"
+                    >
+                      <div className="flex justify-center items-center gap-2 text-muted-foreground">
+                        <Loader2 className="h-5 w-5 animate-spin" />
+                        Loading students...
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ) : students.length === 0 ? (
+                  <TableRow>
+                    <TableCell
+                      colSpan={7}
+                      className="text-center text-muted-foreground py-10"
+                    >
+                      No students found
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  students.map((reg) => (
+                    <TableRow key={reg.id}>
+                      <TableCell>{reg.student_id}</TableCell>
+                      <TableCell>{reg.institution?.name ?? "-"}</TableCell>
+                      <TableCell>{reg.rollNumber}</TableCell>
+                      <TableCell>
+                        {reg.student?.firstName} {reg.student?.lastName}
+                      </TableCell>
+                      <TableCell>{reg.student?.gender ?? "-"}</TableCell>
+                      <TableCell>
+                        {reg.student?.dob?.slice(0, 10) ?? "-"}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button
+                          size="sm"
+                          onClick={() => viewStudent(reg.student_id)}
+                        >
+                          View
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
 
-            <Button
-              type="submit"
-              variant="secondary"
-              className="w-full rounded-2xl"
-            >
-              {returnLoading ? (
-                <>
-                  <Loader2 className="animate-spin h-4 w-4 mr-2" />
-                  Returning...
-                </>
-              ) : (
-                "Return Book"
-              )}
-            </Button>
-
-          </form>
+            </Table>
+          </div>
         </CardContent>
       </Card>
 
     </div>
   );
-};
-
-export default IssueReturn;
+}

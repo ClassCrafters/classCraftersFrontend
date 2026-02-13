@@ -27,6 +27,19 @@ export const getBooks = createAsyncThunk(
     }
 );
 
+// Get Books by Student ID
+export const getBooksByStudent = createAsyncThunk(
+    "library/getBooksByStudent",
+    async (studentId, { rejectWithValue }) => {
+        try {
+            const response = await libraryService.getBooksByStudent(studentId);
+            return response; // ✅ return actual data
+        } catch (error) {
+            return rejectWithValue(error.response?.data || error.message);
+        }
+    }
+);
+
 // Delete Book
 export const deleteBook = createAsyncThunk(
     "library/deleteBook",
@@ -70,6 +83,7 @@ const librarySlice = createSlice({
     name: "library",
     initialState: {
         books: [],
+        getBooksbyStudent: [],
         loading: false,
         error: null,
     },
@@ -127,6 +141,20 @@ const librarySlice = createSlice({
                 ); // ✅ use payload directly (id)
             })
             .addCase(deleteBook.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            });
+        // Get Books by Student ID
+        builder
+            .addCase(getBooksByStudent.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(getBooksByStudent.fulfilled, (state, action) => {
+                state.loading = false;
+                state.getBooksbyStudent = action.payload;
+            })
+            .addCase(getBooksByStudent.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
             });

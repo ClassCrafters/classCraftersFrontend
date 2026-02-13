@@ -9,9 +9,9 @@ import {SocketProvider} from './context/SocketProvider.jsx';
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <Provider store={Store}>
-      <SocketProvider>
+      {/* <SocketProvider> */}
         <App />
-      </SocketProvider>
+      {/* </SocketProvider> */}
     </Provider>
   </StrictMode>,
 )

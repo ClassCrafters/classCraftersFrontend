@@ -19,6 +19,7 @@ import staffReducer from "./slices/staffSlice";
 import leaveReducer from "./slices/leaveSlice";
 import alumniReducer from "./slices/alumniSlice";
 import libraryReducer from "./slices/librarySlice";
+import inventoryReducer from "./slices/inventorySlice";
 // import courseReducer from "./slices/courseSlice";
 
 const rootReducer = combineReducers({
@@ -42,6 +43,7 @@ timeTable: timeTableReducer,
 leave: leaveReducer,
 alumni: alumniReducer,
 library : libraryReducer,
+inventory: inventoryReducer,
 //   course: courseReducer,
 });
 

@@ -37,6 +37,7 @@ import Alumni from "../pages/alumni";
 import Library from "../pages/library";
 import BookList from "../pages/library/bookList";
 import IssueReturn from "../pages/library/issue-return";
+import ManageIssueReturn from "../pages/library/issue-return/manageIssueReturn";
 import Inventory from "../pages/inventory";
 
 import HorizontalLayout from "@/layouts/horizontal";
@@ -126,6 +127,7 @@ const AppRouter = () => {
               <Route path="/inventory" element={<Inventory />} />
               <Route path="/library/booklist" element={<BookList />} />
               <Route path="/library/issue-return" element={<IssueReturn />} />
+              <Route path="/library/issue-return/manage/:studentId" element={<ManageIssueReturn />} />
 
             </Route>
             <Route path="/students/attendance" element={<AttendancePage />} />
