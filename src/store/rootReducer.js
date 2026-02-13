@@ -17,6 +17,8 @@ import frontOfficeReducer from "./slices/frontOfficeSlice";
 import timeTableReducer from "./slices/timeTableSlice";
 import staffReducer from "./slices/staffSlice";
 import leaveReducer from "./slices/leaveSlice";
+import alumniReducer from "./slices/alumniSlice";
+import libraryReducer from "./slices/librarySlice";
 // import courseReducer from "./slices/courseSlice";
 
 const rootReducer = combineReducers({
@@ -38,6 +40,8 @@ quiz: quizReducer,
 frontOffice: frontOfficeReducer,
 timeTable: timeTableReducer,
 leave: leaveReducer,
+alumni: alumniReducer,
+library : libraryReducer,
 //   course: courseReducer,
 });
 

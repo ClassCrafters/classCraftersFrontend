@@ -33,6 +33,11 @@ import ManageAssign from "../pages/payment/assignFees/manageAssign";
 import CollectFees from "../pages/payment/collectFees";
 import ManageCollect from "../pages/payment/collectFees/manageCollect";
 import SearchDueFees from "../pages/payment/searchDueFees";
+import Alumni from "../pages/alumni";
+import Library from "../pages/library";
+import BookList from "../pages/library/bookList";
+import IssueReturn from "../pages/library/issue-return";
+import Inventory from "../pages/inventory";
 
 import HorizontalLayout from "@/layouts/horizontal";
 
@@ -84,6 +89,7 @@ const AppRouter = () => {
               <Route path="/payment/collect-fees" element={<CollectFees />} />
               <Route path="/payment/collect-fees/:id" element={<ManageCollect />} />
               <Route path="/payment/search-due-fees" element={<SearchDueFees />} />
+
             </Route>
 
             {/* STUDENT + TEACHER + ADMIN */}
@@ -94,7 +100,7 @@ const AppRouter = () => {
                 />
               }
             > {/* Academics + Leave Management */}
-          <Route path="academics/leave-management" element={<LeaveManagement />} />
+              <Route path="academics/leave-management" element={<LeaveManagement />} />
               <Route path="/payment/fee-structure" element={<PaymentPage />} />
               <Route path="/settings/profile" element={<ProfilePage />} />
               <Route path="/students/attendance" element={<AttendancePage />} />
@@ -103,18 +109,23 @@ const AppRouter = () => {
                 element={<ManageAttendancePage />}
               />
               <Route path="/students/attendance/manage" element={<ManageAttendancePage />} />
-              <Route path="/students/admission" element={<Admission />}/>
-               <Route path="/students/details/:studentId" element={<StudentDetails />}/>
+              <Route path="/students/admission" element={<Admission />} />
+              <Route path="/students/details/:studentId" element={<StudentDetails />} />
               <Route path="/video-stream/lobby" element={<LobbyPage />} />
               <Route path="/video-stream/room/:roomId" element={<RoomPage />} />
               <Route path="/front-office/enquiries" element={<EnquiryPage />} />
               <Route path="/front-office/visitor-book" element={<VisitorBook />} />
               <Route path="/front-office/dispatch" element={<Dispatch />} />
-              <Route path="/front-office/receive" element={<PostalReceive />} />  
+              <Route path="/front-office/receive" element={<PostalReceive />} />
               <Route path="/front-office/complain" element={<ComplainPage />} />
               <Route path="/teacher/timetable" element={<TeacherTimeTable />} />
               <Route path="/student/timetable" element={<StudentTimeTable />} />
               <Route path="/subjects" element={<Subjects />} />
+              <Route path="/alumni" element={<Alumni />} />
+              <Route path="/library" element={<Library />} />
+              <Route path="/inventory" element={<Inventory />} />
+              <Route path="/library/booklist" element={<BookList />} />
+              <Route path="/library/issue-return" element={<IssueReturn />} />
 
             </Route>
             <Route path="/students/attendance" element={<AttendancePage />} />
