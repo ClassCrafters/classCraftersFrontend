@@ -11,10 +11,17 @@ import {
   ChevronUp,
   School,
   Receipt,
-  Presentation
+  Presentation,
+  Car,
+  MessageCircle,
+  BookCheck,
+  BookOpenCheck
+  
 } from "lucide-react";
 import { Link } from "react-router-dom"; // 🔥 IMPORTANT
 import logo from "@/assets/logo.png";
+import AppMenuModal from "@/components/modals/appMenuModal";
+
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(true);
@@ -65,6 +72,14 @@ const Sidebar = () => {
         { href: "/academics/leave-management", label: "Leave Management" }
       ],
     },
+    {
+      label: "Examinations",
+      icon: <BookCheck size={20} />,
+    },
+    {
+      label: "Lessons",
+      icon: <BookOpenCheck size={20} />,
+    },
 
     {
       label: "Payment",
@@ -101,16 +116,30 @@ const Sidebar = () => {
         { href: "/inventory", label: "Inventory" },
       ],
     },
+    {
+      label: "Human Resource",
+      icon: <Settings size={20} />,
+    },
+
+    {
+      label: "Transport",
+      icon: <Car size={20} />,
+      children: [
+        { href: "/transport/vehicles", label: "Vehicles" },
+        { href: "/transport/drivers", label: "Drivers" },
+        { href: "/transport/routes", label: "Routes" },
+        { href: "/transport/add-stop", label: "Add Stop" },
+        { href: "/assign-student-transport", label: "Assign Student Transport" },
+      ],
+    },
 
     {
       label: "Messenger",
-      icon: <Settings size={20} />,
+      icon: <MessageCircle size={20} />,
       children: [
         { href: "/messenger/list", label: "Profile" },
       ],
     },
-
-
 
     {
       label: "Settings",
@@ -151,6 +180,11 @@ const Sidebar = () => {
             CC
           </div>
         )}
+      </div>
+      
+      {/* App Menu Modal */}
+      <div className="mb-4 flex justify-center">
+      <AppMenuModal />
       </div>
 
       {/* Menu */}

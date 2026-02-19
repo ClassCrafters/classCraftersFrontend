@@ -39,6 +39,11 @@ import BookList from "../pages/library/bookList";
 import IssueReturn from "../pages/library/issue-return";
 import ManageIssueReturn from "../pages/library/issue-return/manageIssueReturn";
 import Inventory from "../pages/inventory";
+import Vehicles from "../pages/transport/vehicles";
+import Drivers from "../pages/transport/drivers";
+import RoutesPage from "../pages/transport/routes";
+import AssignStudent from "../pages/transport/assignStudents";
+import AddStop from "../pages/transport/addStop";
 
 import HorizontalLayout from "@/layouts/horizontal";
 
@@ -67,6 +72,7 @@ const AppRouter = () => {
             <Route element={<ProtectedRoute allowedRoles={["Admin"]} />}>
               <Route path="/users" element={<UsersPage />} />
               <Route path="/roles" element={<RolesPage />} />
+             
             </Route>
 
             {/* TEACHER + ADMIN */}
@@ -90,6 +96,11 @@ const AppRouter = () => {
               <Route path="/payment/collect-fees" element={<CollectFees />} />
               <Route path="/payment/collect-fees/:id" element={<ManageCollect />} />
               <Route path="/payment/search-due-fees" element={<SearchDueFees />} />
+               <Route path="/transport/vehicles" element={<Vehicles />} />
+              <Route path="/transport/drivers" element={<Drivers />} />
+              <Route path="/transport/routes" element={<RoutesPage />} />
+              <Route path="/assign-student-transport" element={<AssignStudent />} />
+              <Route path="/transport/add-stop" element={<AddStop />} />
 
             </Route>
 
