@@ -75,6 +75,11 @@ const Sidebar = () => {
     {
       label: "Examinations",
       icon: <BookCheck size={20} />,
+      children: [
+        { href: "/examinations/exam-group", label: "Exam Groups" },
+        { href: "/examinations/exam-schedule", label: "Exam Schedule" },
+        { href: "/examinations/exam-result", label: "Exam Results" },
+      ],
     },
     {
       label: "Lessons",

@@ -21,6 +21,7 @@ import alumniReducer from "./slices/alumniSlice";
 import libraryReducer from "./slices/librarySlice";
 import inventoryReducer from "./slices/inventorySlice";
 import transportReducer from "./slices/transportSlice";
+import examReducer from "./slices/examSlice";
 // import courseReducer from "./slices/courseSlice";
 
 const rootReducer = combineReducers({
@@ -45,7 +46,8 @@ leave: leaveReducer,
 alumni: alumniReducer,
 library : libraryReducer,
 inventory: inventoryReducer,
-transport: transportReducer
+transport: transportReducer,
+exams: examReducer
 //   course: courseReducer,
 });
 
