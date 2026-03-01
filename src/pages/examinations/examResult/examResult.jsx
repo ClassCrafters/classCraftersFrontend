@@ -79,29 +79,35 @@ const ExamResult = () => {
   };
 
   return (
-    <div className="p-8 max-w-6xl mx-auto space-y-6">
-      <h1 className="text-3xl font-bold">Exam Results</h1>
+    <div className="p-10 max-w-6xl mx-auto space-y-8">
+      <h1 className="text-3xl font-bold tracking-tight">
+        Exam Results
+      </h1>
 
-      {/* Create Result */}
-      <Card>
+      {/* Create Result Card */}
+      <Card className="rounded-2xl shadow-sm">
         <CardHeader>
           <CardTitle>Add Exam Result</CardTitle>
         </CardHeader>
+
         <CardContent>
           <form
             onSubmit={handleCreateResult}
-            className="grid grid-cols-1 md:grid-cols-2 gap-4"
+            className="grid grid-cols-1 md:grid-cols-2 gap-6"
           >
-            <div>
-              <label className="block text-sm font-medium mb-1">Select Exam</label>
+            {/* Exam Select */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">
+                Select Exam
+              </label>
               <select
-                className="w-full border rounded px-2 py-1"
+                className="w-full h-10 rounded-md border bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                 value={examId}
                 onChange={(e) => setExamId(e.target.value)}
                 required
               >
-                <option value="">-- choose exam --</option>
-                {exams.map((ex) => (
+                <option value="">-- Choose Exam --</option>
+                {exams?.map((ex) => (
                   <option key={ex.id} value={ex.id}>
                     {ex.name}
                   </option>
@@ -109,90 +115,127 @@ const ExamResult = () => {
               </select>
             </div>
 
-            <Input
-              type="number"
-              placeholder="Student ID"
-              value={formData.studentId}
-              onChange={(e) =>
-                handleChange("studentId", e.target.value)
-              }
-            />
+            {/* Student ID */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">
+                Student ID
+              </label>
+              <Input
+                type="number"
+                placeholder="Enter Student ID"
+                value={formData.studentId}
+                onChange={(e) =>
+                  handleChange("studentId", e.target.value)
+                }
+              />
+            </div>
 
-            <Input
-              type="number"
-              placeholder="Subject ID"
-              value={formData.subjectId}
-              onChange={(e) =>
-                handleChange("subjectId", e.target.value)
-              }
-            />
+            {/* Subject ID */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">
+                Subject ID
+              </label>
+              <Input
+                type="number"
+                placeholder="Enter Subject ID"
+                value={formData.subjectId}
+                onChange={(e) =>
+                  handleChange("subjectId", e.target.value)
+                }
+              />
+            </div>
 
-            <Input
-              type="number"
-              placeholder="Marks Obtained"
-              value={formData.marksObtained}
-              onChange={(e) =>
-                handleChange("marksObtained", e.target.value)
-              }
-            />
+            {/* Marks */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">
+                Marks Obtained
+              </label>
+              <Input
+                type="number"
+                placeholder="Enter Marks"
+                value={formData.marksObtained}
+                onChange={(e) =>
+                  handleChange("marksObtained", e.target.value)
+                }
+              />
+            </div>
 
-            <div className="md:col-span-2 flex gap-4">
-              <Button type="submit" className="w-full">
-                Add Result
-              </Button>
-
+            {/* Buttons */}
+            <div className="md:col-span-2 flex justify-end gap-4 pt-2">
               <Button
                 type="button"
                 variant="outline"
                 onClick={handleFetchResults}
-                className="w-full"
+                className="min-w-[150px]"
               >
                 Fetch Results
+              </Button>
+
+              <Button
+                type="submit"
+                className="min-w-[150px]"
+              >
+                Add Result
               </Button>
             </div>
           </form>
 
           {error && (
-            <p className="text-red-500 mt-4">{error}</p>
+            <p className="text-red-500 text-sm mt-4">
+              {error}
+            </p>
           )}
         </CardContent>
       </Card>
 
       {/* Results Table */}
-      <Card>
+      <Card className="rounded-2xl shadow-sm">
         <CardHeader>
           <CardTitle>Results List</CardTitle>
         </CardHeader>
+
         <CardContent>
-          {loading && <p>Loading...</p>}
+          {loading && (
+            <p className="text-sm text-muted-foreground">
+              Loading results...
+            </p>
+          )}
 
           {!loading && results?.length === 0 && (
-            <p>No results found.</p>
+            <p className="text-sm text-muted-foreground">
+              No results found.
+            </p>
           )}
 
           {!loading && results?.length > 0 && (
-            <div className="overflow-x-auto">
-              <table className="w-full border rounded-xl">
+            <div className="overflow-x-auto rounded-lg border">
+              <table className="w-full text-sm">
                 <thead className="bg-muted">
                   <tr>
-                    <th className="p-3 text-left">Student</th>
-                    <th className="p-3 text-left">Subject</th>
-                    <th className="p-3 text-left">Marks</th>
+                    <th className="px-4 py-3 text-left font-medium">
+                      Student ID
+                    </th>
+                    <th className="px-4 py-3 text-left font-medium">
+                      Subject ID
+                    </th>
+                    <th className="px-4 py-3 text-left font-medium">
+                      Marks
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {results.map((result) => (
                     <tr
                       key={result.id}
-                      className="border-t hover:bg-muted/50"
+                      className="border-t hover:bg-muted/50 transition"
                     >
-                      <td className="p-3">
+                      <td className="px-4 py-3">
                         {result.studentId}
                       </td>
-                      <td className="p-3">
+                      <td className="px-4 py-3">
                         {result.subjectId}
                       </td>
-                      <td className="p-3 font-semibold">
+                      <td className="px-4 py-3 font-semibold">
                         {result.marksObtained}
                       </td>
                     </tr>
