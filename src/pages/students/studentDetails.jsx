@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useParams, useNavigate } from "react-router-dom";
 
 import { fetchStudentsById } from "../../store/slices/studentSlice";
-import { selectStudentsByid } from "../../store/selectors/studentSelectors";
+import { selectSelectedStudent } from "../../store/selectors/studentSelectors";
 
 import {
   Card,
@@ -23,9 +23,9 @@ export default function StudentDetails() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const registration = useSelector(selectStudentsByid);
+  const registration = useSelector(selectSelectedStudent);
   // console.log("Registration:", registration);
-
+  
   useEffect(() => {
     dispatch(fetchStudentsById(studentId));
   }, [dispatch, studentId]);
