@@ -44,6 +44,10 @@ import Drivers from "../pages/transport/drivers";
 import RoutesPage from "../pages/transport/routes";
 import AssignStudent from "../pages/transport/assignStudents";
 import AddStop from "../pages/transport/addStop";
+import ExamGroup from "../pages/examinations/examGroup/examGroup";
+import ExamSchedule from "../pages/examinations/examSchedule/examSchedule";
+import ExamResult from "../pages/examinations/examResult/examResult";
+
 
 import HorizontalLayout from "@/layouts/horizontal";
 
@@ -101,6 +105,9 @@ const AppRouter = () => {
               <Route path="/transport/routes" element={<RoutesPage />} />
               <Route path="/assign-student-transport" element={<AssignStudent />} />
               <Route path="/transport/add-stop" element={<AddStop />} />
+              <Route path="/examinations/exam-group" element={<ExamGroup />} />
+              <Route path="/examinations/exam-schedule" element={<ExamSchedule />} />
+              <Route path="/examinations/exam-result" element={<ExamResult />} />
 
             </Route>
 
